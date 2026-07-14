@@ -53,6 +53,7 @@ let records = counterGroups.map((group, index) => {
 const tableBody = document.querySelector('#tableBody');
 const addModal = document.querySelector('#addModal');
 const importModal = document.querySelector('#importModal');
+const counterFilter = document.querySelector('#counterFilter');
 const counterSelect = document.querySelector('#counterSelect');
 const cashierNameInput = document.querySelector('#cashierNameInput');
 const cashierIdInput = document.querySelector('#cashierIdInput');
@@ -63,19 +64,21 @@ const remarkInput = document.querySelector('#remarkInput');
 const formTitle = document.querySelector('#formTitle');
 
 function fillOptions() {
-  counterSelect.innerHTML = counterGroups.map(group => `<option value="${group}">${group}</option>`).join('');
+  const counterOptions = counterGroups.map(group => `<option value="${group}">${group}</option>`).join('');
+  counterFilter.innerHTML = `<option value="">全部柜组</option>${counterOptions}`;
+  counterSelect.innerHTML = counterOptions;
   cashierNameInput.value = cashiers[0].name;
   cashierIdInput.value = cashiers[0].id;
 }
 
 function filteredRecords() {
-  const counterValue = document.querySelector('#counterFilter').value.trim().toLowerCase();
+  const counterValue = counterFilter.value;
   const idValue = document.querySelector('#cashierIdFilter').value.trim().toLowerCase();
   const nameValue = document.querySelector('#cashierNameFilter').value.trim().toLowerCase();
   const relationValue = document.querySelector('#relationFilter').value;
   const statusValue = document.querySelector('#statusFilter').value;
   return records.filter(record => {
-    return (!counterValue || record.counter.toLowerCase().includes(counterValue)) &&
+    return (!counterValue || record.counter === counterValue) &&
       (!idValue || record.cashierId.toLowerCase().includes(idValue)) &&
       (!nameValue || record.cashier.toLowerCase().includes(nameValue)) &&
       (!relationValue || record.relationType === relationValue) &&
