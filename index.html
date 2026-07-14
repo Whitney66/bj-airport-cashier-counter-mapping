@@ -130,6 +130,20 @@
     </div>
   </div>
 
+  <div class="modal-mask" id="reviewModal" hidden>
+    <div class="modal review-modal el-dialog">
+      <div class="modal-head el-dialog__header"><h2>核对跨柜组记录</h2><button class="close el-dialog__headerbtn" data-close>×</button></div>
+      <div class="review-body">
+        <p class="review-tip">以下为待复核的跨柜组收款记录，请核对柜组、收银员、工号、收银件数与收银笔数是否一致。</p>
+        <table class="review-table">
+          <thead><tr><th>月份</th><th>柜组名称</th><th>收银员</th><th>工号</th><th>收银件数</th><th>收银笔数</th><th>备注</th></tr></thead>
+          <tbody id="reviewBody"></tbody>
+        </table>
+      </div>
+      <div class="modal-actions"><button class="primary el-button el-button--primary" id="confirmReviewBtn">确认核对</button><button class="ghost el-button" data-close>取消</button></div>
+    </div>
+  </div>
+
   <script src="./script.js"></script>
 </body>
 </html>

@@ -99,15 +99,14 @@ button { cursor: pointer; }
 .filters, .table-wrap, .pager { background: var(--panel); border: 1px solid var(--line); }
 .filters { position: relative; padding: 22px 18px 16px; margin-bottom: 12px; overflow: hidden; }
 .filter-grid {
-  display: flex;
-  flex-wrap: wrap;
-  column-gap: 24px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(260px, 1fr));
+  column-gap: 36px;
   row-gap: 18px;
-  align-items: flex-start;
+  align-items: center;
 }
 .filter-grid > label {
-  flex: 0 0 auto;
-  width: auto;
+  width: 100%;
   min-width: 0;
   max-width: none;
 }
@@ -125,16 +124,21 @@ input, select, .select, .date {
   min-width: 0;
   box-shadow: none;
 }
-input, select { width: 245px; outline: none; }
-#monthFilter { width: 230px; }
-#counterFilter, #cashierIdFilter, #cashierNameFilter, #relationFilter, #statusFilter { width: 245px; }
+input, select { width: 100%; outline: none; }
+#monthFilter,
+#counterFilter,
+#cashierIdFilter,
+#cashierNameFilter,
+#relationFilter,
+#statusFilter { width: 100%; }
 input::placeholder { color: #c0c4cc; }
 .filter-buttons {
-  flex: 0 0 auto;
+  grid-column: 4;
+  grid-row: 2;
   display: flex;
   gap: 18px;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: flex-end;
   padding-top: 0;
 }
 .collapse { display: none; }
@@ -193,6 +197,7 @@ th:nth-child(12), td:nth-child(12) { width: 170px; }
 .modal { background: #fff; border-radius: 4px; box-shadow: var(--shadow); }
 .import-modal { width: 560px; }
 .add-modal { width: min(880px, calc(100vw - 96px)); overflow: hidden; }
+.review-modal { width: min(960px, calc(100vw - 96px)); overflow: hidden; }
 .modal-head { height: 54px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
 .modal-head h2 { margin: 0; font-size: 16px; font-weight: 700; color: #303133; }
 .close { border: 0; background: transparent; font-size: 24px; color: #909399; }
@@ -223,11 +228,22 @@ th:nth-child(12), td:nth-child(12) { width: 170px; }
   white-space: normal;
   word-break: break-word;
 }
+.review-body { padding: 18px 24px 8px; }
+.review-tip { margin: 0 0 12px; color: #606266; }
+.review-table { width: 100%; min-width: 0; table-layout: fixed; border: 1px solid var(--line); }
+.review-table th,
+.review-table td { height: 42px; padding: 0 10px; font-size: 14px; }
+
+@media (max-width: 1400px) {
+  .filter-grid { grid-template-columns: repeat(3, minmax(260px, 1fr)); }
+  .filter-buttons { grid-column: 3; grid-row: auto; justify-content: flex-end; }
+}
 
 @media (max-width: 900px) {
   .topbar { overflow-x: auto; }
   .page { padding: 10px; }
-  .filter-grid > label { flex-basis: 100%; min-width: 0; max-width: none; }
+  .filter-grid { grid-template-columns: 1fr; }
+  .filter-buttons { grid-column: 1; grid-row: auto; justify-content: flex-end; }
   label { gap: 14px; }
   label span { min-width: 86px; }
   .toolbar, .pager { min-width: 760px; }

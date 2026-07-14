@@ -53,6 +53,7 @@ let records = counterGroups.map((group, index) => {
 const tableBody = document.querySelector('#tableBody');
 const addModal = document.querySelector('#addModal');
 const importModal = document.querySelector('#importModal');
+const reviewModal = document.querySelector('#reviewModal');
 const counterFilter = document.querySelector('#counterFilter');
 const counterSelect = document.querySelector('#counterSelect');
 const monthInput = document.querySelector('#monthInput');
@@ -132,6 +133,23 @@ function openModal(mode, record) {
 function closeModals() {
   addModal.hidden = true;
   importModal.hidden = true;
+  reviewModal.hidden = true;
+}
+
+function openReviewModal() {
+  const pendingRows = records.filter(record => record.relationType === '跨柜组' && record.status === '待复核');
+  document.querySelector('#reviewBody').innerHTML = pendingRows.length ? pendingRows.map(record => `
+    <tr>
+      <td>${record.month}</td>
+      <td>${record.counter}</td>
+      <td>${record.cashier}</td>
+      <td>${record.cashierId}</td>
+      <td>${record.items}</td>
+      <td>${record.txns}</td>
+      <td>${record.remark || '-'}</td>
+    </tr>
+  `).join('') : '<tr><td colspan="7">暂无待复核跨柜组记录</td></tr>';
+  reviewModal.hidden = false;
 }
 
 function bindRowActions() {
@@ -207,14 +225,18 @@ document.querySelector('#editBtn').addEventListener('click', () => {
 document.querySelector('#importBtn').addEventListener('click', () => { importModal.hidden = false; });
 document.querySelector('#queryBtn').addEventListener('click', render);
 document.querySelector('#resetBtn').addEventListener('click', resetFilters);
-document.querySelector('#validateBtn').addEventListener('click', () => {
-  records = records.map(record => record.relationType === '跨柜组' ? { ...record, status: '已维护', updater: '复核员01', updatedAt: '2026-07-14 11:00' } : record);
-  render();
-});
+document.querySelector('#validateBtn').addEventListener('click', openReviewModal);
 document.querySelector('.danger').addEventListener('click', () => {
   if (!selectedIds.size) return;
   records = records.filter(record => !selectedIds.has(record.id));
   selectedIds.clear();
+  render();
+});
+document.querySelector('#confirmReviewBtn').addEventListener('click', () => {
+  records = records.map(record => record.relationType === '跨柜组' && record.status === '待复核'
+    ? { ...record, status: '已维护', updater: '复核员01', updatedAt: '2026-07-14 11:00' }
+    : record);
+  closeModals();
   render();
 });
 document.querySelector('#saveRelationBtn').addEventListener('click', saveRelation);
