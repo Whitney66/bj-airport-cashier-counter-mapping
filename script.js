@@ -63,9 +63,7 @@ const remarkInput = document.querySelector('#remarkInput');
 const formTitle = document.querySelector('#formTitle');
 
 function fillOptions() {
-  const counterOptions = counterGroups.map(group => `<option value="${group}">${group}</option>`).join('');
-  counterSelect.innerHTML = counterOptions;
-  document.querySelector('#counterOptions').innerHTML = counterOptions;
+  counterSelect.innerHTML = counterGroups.map(group => `<option value="${group}">${group}</option>`).join('');
   cashierNameInput.value = cashiers[0].name;
   cashierIdInput.value = cashiers[0].id;
 }
