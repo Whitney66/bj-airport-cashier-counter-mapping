@@ -97,21 +97,22 @@ button { cursor: pointer; }
 .tabs span { margin-left: 6px; color: inherit; opacity: .85; }
 
 .filters, .table-wrap, .pager { background: var(--panel); border: 1px solid var(--line); }
-.filters { position: relative; padding: 24px 18px 12px; margin-bottom: 12px; overflow: hidden; }
+.filters { position: relative; padding: 22px 18px 16px; margin-bottom: 12px; overflow: hidden; }
 .filter-grid {
   display: flex;
   flex-wrap: wrap;
-  column-gap: 52px;
-  row-gap: 22px;
+  column-gap: 24px;
+  row-gap: 18px;
   align-items: flex-start;
 }
 .filter-grid > label {
-  flex: 0 1 360px;
-  min-width: 300px;
-  max-width: 420px;
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 0;
+  max-width: none;
 }
-label { display: flex; align-items: center; gap: 24px; min-width: 0; margin: 0; }
-label span { display: block; flex: 0 0 auto; min-width: 86px; color: #16324a; margin: 0; font-size: 16px; white-space: nowrap; text-align: left; }
+label { display: flex; align-items: center; gap: 12px; min-width: 0; margin: 0; }
+label span { display: block; flex: 0 0 auto; min-width: auto; color: #16324a; margin: 0; font-size: 16px; white-space: nowrap; text-align: left; }
 input, select, .select, .date {
   height: 36px;
   border: 1px solid #dcdfe6;
@@ -124,16 +125,17 @@ input, select, .select, .date {
   min-width: 0;
   box-shadow: none;
 }
-input, select { width: 100%; outline: none; }
+input, select { width: 245px; outline: none; }
+#monthFilter { width: 230px; }
+#counterFilter, #cashierIdFilter, #cashierNameFilter, #relationFilter, #statusFilter { width: 245px; }
 input::placeholder { color: #c0c4cc; }
 .filter-buttons {
-  flex: 0 0 100%;
+  flex: 0 0 auto;
   display: flex;
   gap: 18px;
   align-items: center;
   justify-content: flex-start;
-  padding-top: 4px;
-  padding-left: 0;
+  padding-top: 0;
 }
 .collapse { display: none; }
 
@@ -190,7 +192,7 @@ th:nth-child(12), td:nth-child(12) { width: 170px; }
 .modal-mask[hidden] { display: none; }
 .modal { background: #fff; border-radius: 4px; box-shadow: var(--shadow); }
 .import-modal { width: 560px; }
-.add-modal { width: 880px; }
+.add-modal { width: min(880px, calc(100vw - 96px)); overflow: hidden; }
 .modal-head { height: 54px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
 .modal-head h2 { margin: 0; font-size: 16px; font-weight: 700; color: #303133; }
 .close { border: 0; background: transparent; font-size: 24px; color: #909399; }
@@ -207,7 +209,20 @@ th:nth-child(12), td:nth-child(12) { width: 170px; }
 .relation-form label span { margin-bottom: 8px; font-size: 14px; color: #4e5f73; }
 .relation-form input, .relation-form select, .relation-form .date { width: 100%; height: 40px; }
 .relation-form .wide { grid-column: 1 / -1; }
-.form-note { margin: 0 24px 22px; padding: 12px 14px; border: 1px solid #faecd8; border-radius: 3px; background: #fdf6ec; color: #b37813; line-height: 20px; }
+.form-note {
+  display: block;
+  width: auto;
+  max-width: calc(100% - 48px);
+  margin: 0 24px 22px;
+  padding: 12px 14px;
+  border: 1px solid #faecd8;
+  border-radius: 3px;
+  background: #fdf6ec;
+  color: #b37813;
+  line-height: 20px;
+  white-space: normal;
+  word-break: break-word;
+}
 
 @media (max-width: 900px) {
   .topbar { overflow-x: auto; }

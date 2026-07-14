@@ -55,6 +55,7 @@ const addModal = document.querySelector('#addModal');
 const importModal = document.querySelector('#importModal');
 const counterFilter = document.querySelector('#counterFilter');
 const counterSelect = document.querySelector('#counterSelect');
+const monthInput = document.querySelector('#monthInput');
 const cashierNameInput = document.querySelector('#cashierNameInput');
 const cashierIdInput = document.querySelector('#cashierIdInput');
 const relationType = document.querySelector('#relationType');
@@ -117,6 +118,7 @@ function updateSummary(rows) {
 function openModal(mode, record) {
   editingId = mode === 'edit' ? record.id : null;
   formTitle.textContent = mode === 'edit' ? '修改关系' : mode === 'copy' ? '复制关系' : '新增关系';
+  monthInput.value = record?.month || document.querySelector('#monthFilter').value || '2026-06';
   counterSelect.value = record?.counter || counterGroups[0];
   cashierNameInput.value = record?.cashier || cashiers[0].name;
   cashierIdInput.value = record?.cashierId || cashiers[0].id;
@@ -162,7 +164,7 @@ function bindRowActions() {
 
 function saveRelation() {
   const payload = {
-    month: '2026-06',
+    month: monthInput.value || '2026-06',
     counter: counterSelect.value,
     cashier: cashierNameInput.value.trim() || '未填写',
     cashierId: cashierIdInput.value.trim() || '未填写',
