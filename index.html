@@ -40,13 +40,6 @@
         <button class="selected el-tag el-tag--light">收银员与柜组关系维护 <span>×</span></button>
       </div>
 
-      <section class="summary-band" aria-label="业务概览">
-        <article><span>固定关系</span><strong id="fixedCount">0</strong><em>每月固定柜组收款</em></article>
-        <article><span>跨柜组</span><strong id="crossCount">0</strong><em>偶发跨柜组需标记</em></article>
-        <article><span>收银件数</span><strong id="itemTotal">0</strong><em>按工号关联统计</em></article>
-        <article><span>收银笔数</span><strong id="txnTotal">0</strong><em>维护时辅助核对</em></article>
-      </section>
-
       <section class="filters el-form" id="filters">
         <div class="filter-grid">
           <label class="el-form-item"><span>月份</span><div class="date el-input__inner">▣ 2026-06</div></label>
@@ -125,8 +118,8 @@
       <div class="relation-form el-form">
         <label class="el-form-item"><span>月份</span><div class="date el-input__inner">▣ 2026-06</div></label>
         <label class="el-form-item"><span>柜组名称</span><select class="el-input__inner" id="counterSelect"></select></label>
-        <label class="el-form-item"><span>收银员</span><select class="el-input__inner" id="cashierSelect"></select></label>
-        <label class="el-form-item"><span>收银员工号</span><input class="el-input__inner" id="cashierIdInput" readonly /></label>
+        <label class="el-form-item"><span>收银员</span><input class="el-input__inner" id="cashierNameInput" placeholder="请输入收银员" /></label>
+        <label class="el-form-item"><span>收银员工号</span><input class="el-input__inner" id="cashierIdInput" placeholder="请输入收银员工号" /></label>
         <label class="el-form-item"><span>关系类型</span><select class="el-input__inner" id="relationType"><option>固定柜组</option><option>跨柜组</option></select></label>
         <label class="el-form-item"><span>收银件数</span><input class="el-input__inner" id="itemInput" type="number" value="0" /></label>
         <label class="el-form-item"><span>收银笔数</span><input class="el-input__inner" id="txnInput" type="number" value="0" /></label>

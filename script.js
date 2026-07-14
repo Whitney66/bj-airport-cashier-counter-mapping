@@ -54,7 +54,7 @@ const tableBody = document.querySelector('#tableBody');
 const addModal = document.querySelector('#addModal');
 const importModal = document.querySelector('#importModal');
 const counterSelect = document.querySelector('#counterSelect');
-const cashierSelect = document.querySelector('#cashierSelect');
+const cashierNameInput = document.querySelector('#cashierNameInput');
 const cashierIdInput = document.querySelector('#cashierIdInput');
 const relationType = document.querySelector('#relationType');
 const itemInput = document.querySelector('#itemInput');
@@ -64,7 +64,7 @@ const formTitle = document.querySelector('#formTitle');
 
 function fillOptions() {
   counterSelect.innerHTML = counterGroups.map(group => `<option>${group}</option>`).join('');
-  cashierSelect.innerHTML = cashiers.map(cashier => `<option value="${cashier.id}">${cashier.name}</option>`).join('');
+  cashierNameInput.value = cashiers[0].name;
   cashierIdInput.value = cashiers[0].id;
 }
 
@@ -100,10 +100,6 @@ function render() {
 }
 
 function updateSummary(rows) {
-  document.querySelector('#fixedCount').textContent = rows.filter(r => r.relationType === '固定柜组').length;
-  document.querySelector('#crossCount').textContent = rows.filter(r => r.relationType === '跨柜组').length;
-  document.querySelector('#itemTotal').textContent = rows.reduce((sum, r) => sum + Number(r.items), 0).toLocaleString('zh-CN');
-  document.querySelector('#txnTotal').textContent = rows.reduce((sum, r) => sum + Number(r.txns), 0).toLocaleString('zh-CN');
   document.querySelector('#totalText').textContent = `共 ${rows.length} 条`;
 }
 
@@ -111,7 +107,7 @@ function openModal(mode, record) {
   editingId = record ? record.id : null;
   formTitle.textContent = mode === 'edit' ? '修改关系' : '新增关系';
   counterSelect.value = record?.counter || counterGroups[0];
-  cashierSelect.value = record?.cashierId || cashiers[0].id;
+  cashierNameInput.value = record?.cashier || cashiers[0].name;
   cashierIdInput.value = record?.cashierId || cashiers[0].id;
   relationType.value = record?.relationType || '固定柜组';
   itemInput.value = record?.items || 0;
@@ -141,12 +137,11 @@ function bindRowActions() {
 }
 
 function saveRelation() {
-  const cashier = cashiers.find(item => item.id === cashierSelect.value);
   const payload = {
     month: '2026-06',
     counter: counterSelect.value,
-    cashier: cashier.name,
-    cashierId: cashier.id,
+    cashier: cashierNameInput.value.trim(),
+    cashierId: cashierIdInput.value.trim(),
     relationType: relationType.value,
     items: Number(itemInput.value || 0),
     txns: Number(txnInput.value || 0),
@@ -188,4 +183,3 @@ document.querySelectorAll('.modal-mask').forEach(mask => {
     if (event.target === mask) closeModals();
   });
 });
-cashierSelect.addEventListener('change', () => { cashierIdInput.value = cashierSelect.value; });
