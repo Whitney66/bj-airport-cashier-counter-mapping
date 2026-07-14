@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>收银员与柜组关系维护 - 高保真原型</title>
+  <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.14/lib/theme-chalk/index.css" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="brand-name">大数据平台</div>
+      </div>
+      <nav class="nav">
+        <button class="back el-button el-button--text" aria-label="返回">‹</button>
+        <a>分析</a>
+        <a>库存分析</a>
+        <a>顾客分析</a>
+        <a>采购分析</a>
+        <a>提货分析</a>
+        <a>风险管控</a>
+        <a>离线分析</a>
+        <a>自定义分析</a>
+        <a class="active">数据填报</a>
+      </nav>
+      <div class="top-actions">
+        <div class="search el-input el-input--small"><input class="el-input__inner" placeholder="搜索" /><span>⌕</span></div>
+        <button class="icon-btn el-button el-button--text" aria-label="通知">♢</button>
+        <button class="icon-btn el-button el-button--text" aria-label="全屏">⛶</button>
+        <div class="avatar">cdf</div>
+      </div>
+    </header>
+
+    <main class="page">
+      <div class="tabs">
+        <button class="el-tag">经营看板 <span>×</span></button>
+        <button class="selected el-tag el-tag--light">收银员与柜组关系维护 <span>×</span></button>
+      </div>
+
+      <section class="summary-band" aria-label="业务概览">
+        <article><span>固定关系</span><strong id="fixedCount">0</strong><em>每月固定柜组收款</em></article>
+        <article><span>跨柜组</span><strong id="crossCount">0</strong><em>偶发跨柜组需标记</em></article>
+        <article><span>收银件数</span><strong id="itemTotal">0</strong><em>按工号关联统计</em></article>
+        <article><span>收银笔数</span><strong id="txnTotal">0</strong><em>维护时辅助核对</em></article>
+      </section>
+
+      <section class="filters el-form" id="filters">
+        <div class="filter-grid">
+          <label class="el-form-item"><span>月份</span><div class="date el-input__inner">▣ 2026-06</div></label>
+          <label class="el-form-item"><span>柜组名称</span><div class="select el-input__inner" id="counterFilter">全部柜组 <b>⌄</b></div></label>
+          <label class="el-form-item"><span>收银员工号</span><input class="el-input__inner" id="cashierIdFilter" placeholder="请输入收银员工号" /></label>
+          <label class="el-form-item"><span>收银员姓名</span><input class="el-input__inner" id="cashierNameFilter" placeholder="请输入姓名" /></label>
+          <label class="el-form-item"><span>关系类型</span><div class="select el-input__inner">固定 / 跨柜组 <b>⌄</b></div></label>
+          <label class="el-form-item"><span>维护状态</span><div class="select el-input__inner">全部状态 <b>⌄</b></div></label>
+          <div class="filter-buttons"><button class="primary small el-button el-button--primary" id="queryBtn">⌕ 查询</button><button class="ghost small el-button" id="resetBtn">↻ 重置</button></div>
+        </div>
+        <button class="collapse el-button" id="collapseBtn" aria-label="折叠筛选">⌃</button>
+      </section>
+
+      <section class="toolbar">
+        <div>
+          <button class="primary el-button el-button--primary" id="addBtn">新增关系</button>
+          <button class="outline el-button" id="editBtn">修改</button>
+          <button class="outline el-button" id="importBtn">导入</button>
+          <button class="danger el-button el-button--danger" type="button">▥ 批量删除</button>
+        </div>
+        <button class="sync el-button el-button--primary is-plain" id="validateBtn">核对跨柜组记录</button>
+      </section>
+
+      <section class="table-wrap el-table el-table--border">
+        <table class="el-table__body">
+          <thead>
+            <tr>
+              <th class="check"><input type="checkbox" /></th>
+              <th>月份</th>
+              <th>柜组名称</th>
+              <th>收银员</th>
+              <th>工号</th>
+              <th>关系类型</th>
+              <th>收银件数</th>
+              <th>收银笔数</th>
+              <th>状态</th>
+              <th>最后更新人</th>
+              <th>最后更新时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </section>
+
+      <footer class="pager el-pagination">
+        <div class="float-tools"><button class="el-button">▦</button><button class="el-button">⇩</button><button class="el-button">⇅</button><button class="el-button">Σ</button></div>
+        <span id="totalText">共 0 条</span>
+        <select class="el-input__inner"><option>30条/页</option></select>
+        <button class="page-btn muted el-button">‹</button>
+        <button class="page-btn current el-button el-button--primary">1</button>
+        <button class="page-btn el-button">2</button>
+        <button class="page-btn el-button">›</button>
+        <span>前往</span><input class="jump el-input__inner" value="1" /><span>页</span>
+      </footer>
+    </main>
+  </div>
+
+  <div class="modal-mask" id="importModal" hidden>
+    <div class="modal import-modal el-dialog">
+      <div class="modal-head el-dialog__header"><h2>导入收银员柜组关系</h2><button class="close el-dialog__headerbtn" data-close>×</button></div>
+      <div class="upload-box el-upload el-upload-dragger" id="dropZone">
+        <div class="cloud">☁</div>
+        <p>将文件拖到此处，或<span>点击上传</span></p>
+        <input type="file" accept=".xls,.xlsx" />
+      </div>
+      <label class="checkbox-row el-checkbox"><input type="checkbox" checked /> 同工号同月份存在记录时覆盖固定关系</label>
+      <p class="hint">模板字段：月份、柜组名称、收银员、工号、关系类型、收银件数、收银笔数。<a href="#">下载模板</a></p>
+      <div class="modal-actions"><button class="primary el-button el-button--primary" data-close>确定</button><button class="ghost el-button" data-close>取消</button></div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="addModal" hidden>
+    <div class="modal add-modal el-dialog">
+      <div class="modal-head el-dialog__header"><h2 id="formTitle">新增关系</h2><button class="close el-dialog__headerbtn" data-close>×</button></div>
+      <div class="relation-form el-form">
+        <label class="el-form-item"><span>月份</span><div class="date el-input__inner">▣ 2026-06</div></label>
+        <label class="el-form-item"><span>柜组名称</span><select class="el-input__inner" id="counterSelect"></select></label>
+        <label class="el-form-item"><span>收银员</span><select class="el-input__inner" id="cashierSelect"></select></label>
+        <label class="el-form-item"><span>收银员工号</span><input class="el-input__inner" id="cashierIdInput" readonly /></label>
+        <label class="el-form-item"><span>关系类型</span><select class="el-input__inner" id="relationType"><option>固定柜组</option><option>跨柜组</option></select></label>
+        <label class="el-form-item"><span>收银件数</span><input class="el-input__inner" id="itemInput" type="number" value="0" /></label>
+        <label class="el-form-item"><span>收银笔数</span><input class="el-input__inner" id="txnInput" type="number" value="0" /></label>
+        <label class="wide el-form-item"><span>备注</span><input class="el-input__inner" id="remarkInput" placeholder="跨柜组时填写原因，如临时支援、轮岗、系统补录" /></label>
+      </div>
+      <div class="form-note el-alert el-alert--warning is-light">固定柜组为收银员每月默认收款关系；跨柜组记录保留为例外，用于后续销售件数与笔数核对。</div>
+      <div class="modal-actions"><button class="primary el-button el-button--primary" id="saveRelationBtn">确定</button><button class="ghost el-button" data-close>取消</button></div>
+    </div>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
