@@ -72,13 +72,15 @@ function fillOptions() {
 }
 
 function filteredRecords() {
+  const monthValue = document.querySelector('#monthFilter').value;
   const counterValue = counterFilter.value;
   const idValue = document.querySelector('#cashierIdFilter').value.trim().toLowerCase();
   const nameValue = document.querySelector('#cashierNameFilter').value.trim().toLowerCase();
   const relationValue = document.querySelector('#relationFilter').value;
   const statusValue = document.querySelector('#statusFilter').value;
   return records.filter(record => {
-    return (!counterValue || record.counter === counterValue) &&
+    return (!monthValue || record.month === monthValue) &&
+      (!counterValue || record.counter === counterValue) &&
       (!idValue || record.cashierId.toLowerCase().includes(idValue)) &&
       (!nameValue || record.cashier.toLowerCase().includes(nameValue)) &&
       (!relationValue || record.relationType === relationValue) &&
@@ -183,6 +185,7 @@ function saveRelation() {
 }
 
 function resetFilters() {
+  document.querySelector('#monthFilter').value = '2026-06';
   document.querySelector('#counterFilter').value = '';
   document.querySelector('#cashierIdFilter').value = '';
   document.querySelector('#cashierNameFilter').value = '';
