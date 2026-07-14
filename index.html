@@ -43,14 +43,15 @@
       <section class="filters el-form" id="filters">
         <div class="filter-grid">
           <label class="el-form-item"><span>月份</span><div class="date el-input__inner">▣ 2026-06</div></label>
-          <label class="el-form-item"><span>柜组名称</span><div class="select el-input__inner" id="counterFilter">全部柜组 <b>⌄</b></div></label>
+          <label class="el-form-item"><span>柜组名称</span><input class="el-input__inner" id="counterFilter" list="counterOptions" placeholder="请输入柜组名称" /></label>
           <label class="el-form-item"><span>收银员工号</span><input class="el-input__inner" id="cashierIdFilter" placeholder="请输入收银员工号" /></label>
           <label class="el-form-item"><span>收银员姓名</span><input class="el-input__inner" id="cashierNameFilter" placeholder="请输入姓名" /></label>
-          <label class="el-form-item"><span>关系类型</span><div class="select el-input__inner">固定 / 跨柜组 <b>⌄</b></div></label>
-          <label class="el-form-item"><span>维护状态</span><div class="select el-input__inner">全部状态 <b>⌄</b></div></label>
+          <label class="el-form-item"><span>关系类型</span><select class="el-input__inner" id="relationFilter"><option value="">全部类型</option><option>固定柜组</option><option>跨柜组</option></select></label>
+          <label class="el-form-item"><span>维护状态</span><select class="el-input__inner" id="statusFilter"><option value="">全部状态</option><option>已维护</option><option>待复核</option></select></label>
           <div class="filter-buttons"><button class="primary small el-button el-button--primary" id="queryBtn">⌕ 查询</button><button class="ghost small el-button" id="resetBtn">↻ 重置</button></div>
         </div>
         <button class="collapse el-button" id="collapseBtn" aria-label="折叠筛选">⌃</button>
+        <datalist id="counterOptions"></datalist>
       </section>
 
       <section class="toolbar">

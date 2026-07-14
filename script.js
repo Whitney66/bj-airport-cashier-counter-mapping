@@ -8,7 +8,7 @@ const counterGroups = [
 
 const cashierNames = ['张敏', '王欣', '李娜', '赵凯', '陈晨', '刘洋', '孙妍', '周浩', '吴迪', '郑洁', '马超', '胡佳'];
 const cashiers = cashierNames.map((name, index) => ({ name, id: `BJCA${String(index + 1).padStart(4, '0')}` }));
-
+let selectedIds = new Set();
 let editingId = null;
 let records = counterGroups.map((group, index) => {
   const cashier = cashiers[index % cashiers.length];
@@ -63,17 +63,25 @@ const remarkInput = document.querySelector('#remarkInput');
 const formTitle = document.querySelector('#formTitle');
 
 function fillOptions() {
-  counterSelect.innerHTML = counterGroups.map(group => `<option>${group}</option>`).join('');
+  const counterOptions = counterGroups.map(group => `<option value="${group}">${group}</option>`).join('');
+  counterSelect.innerHTML = counterOptions;
+  document.querySelector('#counterOptions').innerHTML = counterOptions;
   cashierNameInput.value = cashiers[0].name;
   cashierIdInput.value = cashiers[0].id;
 }
 
 function filteredRecords() {
+  const counterValue = document.querySelector('#counterFilter').value.trim().toLowerCase();
   const idValue = document.querySelector('#cashierIdFilter').value.trim().toLowerCase();
   const nameValue = document.querySelector('#cashierNameFilter').value.trim().toLowerCase();
+  const relationValue = document.querySelector('#relationFilter').value;
+  const statusValue = document.querySelector('#statusFilter').value;
   return records.filter(record => {
-    return (!idValue || record.cashierId.toLowerCase().includes(idValue)) &&
-      (!nameValue || record.cashier.toLowerCase().includes(nameValue));
+    return (!counterValue || record.counter.toLowerCase().includes(counterValue)) &&
+      (!idValue || record.cashierId.toLowerCase().includes(idValue)) &&
+      (!nameValue || record.cashier.toLowerCase().includes(nameValue)) &&
+      (!relationValue || record.relationType === relationValue) &&
+      (!statusValue || record.status === statusValue);
   });
 }
 
@@ -81,7 +89,7 @@ function render() {
   const rows = filteredRecords();
   tableBody.innerHTML = rows.map(record => `
     <tr>
-      <td class="check"><input type="checkbox" /></td>
+      <td class="check"><input type="checkbox" data-row-check="${record.id}" ${selectedIds.has(record.id) ? 'checked' : ''} /></td>
       <td>${record.month}</td>
       <td>${record.counter}</td>
       <td>${record.cashier}</td>
@@ -92,7 +100,7 @@ function render() {
       <td><span class="badge el-tag ${record.status === '待复核' ? 'el-tag--warning warn' : 'el-tag--success ok'}">${record.status}</span></td>
       <td>${record.updater}</td>
       <td>${record.updatedAt}</td>
-      <td><div class="ops"><button class="el-button el-button--text" data-edit="${record.id}">编辑</button><button class="delete el-button el-button--text" data-delete="${record.id}">删除</button></div></td>
+      <td><div class="ops"><button class="el-button el-button--text" data-copy="${record.id}">复制</button><button class="el-button el-button--text" data-edit="${record.id}">修改</button><button class="delete el-button el-button--text" data-delete="${record.id}">删除</button></div></td>
     </tr>
   `).join('');
   updateSummary(rows);
@@ -104,8 +112,8 @@ function updateSummary(rows) {
 }
 
 function openModal(mode, record) {
-  editingId = record ? record.id : null;
-  formTitle.textContent = mode === 'edit' ? '修改关系' : '新增关系';
+  editingId = mode === 'edit' ? record.id : null;
+  formTitle.textContent = mode === 'edit' ? '修改关系' : mode === 'copy' ? '复制关系' : '新增关系';
   counterSelect.value = record?.counter || counterGroups[0];
   cashierNameInput.value = record?.cashier || cashiers[0].name;
   cashierIdInput.value = record?.cashierId || cashiers[0].id;
@@ -122,6 +130,18 @@ function closeModals() {
 }
 
 function bindRowActions() {
+  document.querySelectorAll('[data-row-check]').forEach(input => {
+    input.addEventListener('change', () => {
+      const id = Number(input.dataset.rowCheck);
+      input.checked ? selectedIds.add(id) : selectedIds.delete(id);
+    });
+  });
+  document.querySelectorAll('[data-copy]').forEach(button => {
+    button.addEventListener('click', () => {
+      const record = records.find(item => item.id === Number(button.dataset.copy));
+      openModal('copy', record);
+    });
+  });
   document.querySelectorAll('[data-edit]').forEach(button => {
     button.addEventListener('click', () => {
       const record = records.find(item => item.id === Number(button.dataset.edit));
@@ -131,6 +151,7 @@ function bindRowActions() {
   document.querySelectorAll('[data-delete]').forEach(button => {
     button.addEventListener('click', () => {
       records = records.filter(item => item.id !== Number(button.dataset.delete));
+      selectedIds.delete(Number(button.dataset.delete));
       render();
     });
   });
@@ -140,8 +161,8 @@ function saveRelation() {
   const payload = {
     month: '2026-06',
     counter: counterSelect.value,
-    cashier: cashierNameInput.value.trim(),
-    cashierId: cashierIdInput.value.trim(),
+    cashier: cashierNameInput.value.trim() || '未填写',
+    cashierId: cashierIdInput.value.trim() || '未填写',
     relationType: relationType.value,
     items: Number(itemInput.value || 0),
     txns: Number(txnInput.value || 0),
@@ -160,20 +181,34 @@ function saveRelation() {
   render();
 }
 
+function resetFilters() {
+  document.querySelector('#counterFilter').value = '';
+  document.querySelector('#cashierIdFilter').value = '';
+  document.querySelector('#cashierNameFilter').value = '';
+  document.querySelector('#relationFilter').value = '';
+  document.querySelector('#statusFilter').value = '';
+  render();
+}
+
 fillOptions();
 render();
 
 document.querySelector('#addBtn').addEventListener('click', () => openModal('add'));
-document.querySelector('#editBtn').addEventListener('click', () => openModal('add'));
+document.querySelector('#editBtn').addEventListener('click', () => {
+  const firstSelected = records.find(record => selectedIds.has(record.id));
+  openModal('edit', firstSelected || filteredRecords()[0]);
+});
 document.querySelector('#importBtn').addEventListener('click', () => { importModal.hidden = false; });
 document.querySelector('#queryBtn').addEventListener('click', render);
-document.querySelector('#resetBtn').addEventListener('click', () => {
-  document.querySelector('#cashierIdFilter').value = '';
-  document.querySelector('#cashierNameFilter').value = '';
+document.querySelector('#resetBtn').addEventListener('click', resetFilters);
+document.querySelector('#validateBtn').addEventListener('click', () => {
+  records = records.map(record => record.relationType === '跨柜组' ? { ...record, status: '已维护', updater: '复核员01', updatedAt: '2026-07-14 11:00' } : record);
   render();
 });
-document.querySelector('#validateBtn').addEventListener('click', () => {
-  records = records.map(record => record.relationType === '跨柜组' ? { ...record, status: '待复核' } : record);
+document.querySelector('.danger').addEventListener('click', () => {
+  if (!selectedIds.size) return;
+  records = records.filter(record => !selectedIds.has(record.id));
+  selectedIds.clear();
   render();
 });
 document.querySelector('#saveRelationBtn').addEventListener('click', saveRelation);
@@ -181,5 +216,10 @@ document.querySelectorAll('[data-close]').forEach(button => button.addEventListe
 document.querySelectorAll('.modal-mask').forEach(mask => {
   mask.addEventListener('click', event => {
     if (event.target === mask) closeModals();
+  });
+});
+document.querySelectorAll('#counterFilter, #cashierIdFilter, #cashierNameFilter, #relationFilter, #statusFilter').forEach(control => {
+  control.addEventListener('keydown', event => {
+    if (event.key === 'Enter') render();
   });
 });
