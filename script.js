@@ -31,7 +31,6 @@ const cascadePanel = $('#cascadePanel');
 const monthPanel = $('#monthPanel');
 let selectedAreas = new Set(['出境', '入境']);
 let selectedTeams = new Set();
-let activeArea = '出境';
 let activeZone = '烟酒A区';
 let monthStart = '2026-06';
 let monthEnd = '2026-06';
@@ -88,32 +87,31 @@ areaPanel.addEventListener('change', event => {
   if (value === '全部') selectedAreas = checked ? new Set(['出境', '入境']) : new Set();
   else checked ? selectedAreas.add(value) : selectedAreas.delete(value);
   selectedTeams = new Set([...selectedTeams].filter(team => [...selectedAreas].some(area => Object.values(areaHierarchy[area]).flat().includes(team))));
-  if (!selectedAreas.has(activeArea)) activeArea = [...selectedAreas][0] || '';
-  activeZone = activeArea ? Object.keys(areaHierarchy[activeArea])[0] : '';
+  const availableZones = zonesForSelectedAreas();
+  if (!availableZones.some(item => item.key === activeZone)) activeZone = availableZones[0]?.key || '';
   syncAreaCheckboxes(); renderCascade();
 });
 
-function teamsForArea(area) { return Object.values(areaHierarchy[area] || {}).flat(); }
+function zonesForSelectedAreas() {
+  return [...selectedAreas].flatMap(area => Object.entries(areaHierarchy[area] || {}).map(([zone, teams]) => ({ key: zone, zone, teams })));
+}
 function renderCascade() {
-  const areas = [...selectedAreas];
-  $('#cascadeAreas').innerHTML = areas.length ? areas.map(area => `<label class="${area === activeArea ? 'active' : ''}"><input type="checkbox" data-area-check="${area}" ${teamsForArea(area).every(team => selectedTeams.has(team)) ? 'checked' : ''}/><span data-area-nav="${area}">${area}</span><i>›</i></label>`).join('') : '<p>请先选择区域</p>';
-  const zones = Object.keys(areaHierarchy[activeArea] || {});
-  if (!zones.includes(activeZone)) activeZone = zones[0] || '';
-  $('#cascadeZones').innerHTML = zones.map(zone => `<label class="${zone === activeZone ? 'active' : ''}"><input type="checkbox" data-zone-check="${zone}" ${areaHierarchy[activeArea][zone].every(team => selectedTeams.has(team)) ? 'checked' : ''}/><span data-zone-nav="${zone}">${zone}</span><i>›</i></label>`).join('');
-  const teams = areaHierarchy[activeArea]?.[activeZone] || [];
+  const zones = zonesForSelectedAreas();
+  if (!zones.some(item => item.key === activeZone)) activeZone = zones[0]?.key || '';
+  $('#cascadeZones').innerHTML = zones.length ? zones.map(item => `<label class="${item.key === activeZone ? 'active' : ''}"><input type="checkbox" data-zone-check="${item.key}" ${item.teams.every(team => selectedTeams.has(team)) ? 'checked' : ''}/><span data-zone-nav="${item.key}">${item.zone}</span><i>›</i></label>`).join('') : '<p>请先选择区域类型</p>';
+  const activeItem = zones.find(item => item.key === activeZone);
+  const teams = activeItem?.teams || [];
   $('#cascadeTeams').innerHTML = teams.map(team => `<label><input type="checkbox" data-team="${team}" ${selectedTeams.has(team) ? 'checked' : ''}/><span>${team}</span></label>`).join('');
   const summary = selectedTeams.size === 0 ? '请选择柜组' : selectedTeams.size === 1 ? [...selectedTeams][0] : `已选 ${selectedTeams.size} 项`;
   $('#teamSummary').textContent = summary; $('#teamSummary').classList.toggle('placeholder', !selectedTeams.size);
 }
 $('#teamTrigger').addEventListener('click', () => { const opening = cascadePanel.hidden; closePopovers(cascadePanel); cascadePanel.hidden = !opening; renderCascade(); });
 cascadePanel.addEventListener('click', event => {
-  if (event.target.dataset.areaNav) { activeArea = event.target.dataset.areaNav; activeZone = Object.keys(areaHierarchy[activeArea])[0]; renderCascade(); }
   if (event.target.dataset.zoneNav) { activeZone = event.target.dataset.zoneNav; renderCascade(); }
 });
 cascadePanel.addEventListener('change', event => {
   let teams = [];
-  if (event.target.dataset.areaCheck) teams = teamsForArea(event.target.dataset.areaCheck);
-  if (event.target.dataset.zoneCheck) teams = areaHierarchy[activeArea][event.target.dataset.zoneCheck];
+  if (event.target.dataset.zoneCheck) teams = zonesForSelectedAreas().find(item => item.key === event.target.dataset.zoneCheck)?.teams || [];
   if (event.target.dataset.team) teams = [event.target.dataset.team];
   teams.forEach(team => event.target.checked ? selectedTeams.add(team) : selectedTeams.delete(team));
   renderCascade();
@@ -133,8 +131,8 @@ function commitDirectInput(type) {
 document.querySelectorAll('[data-batch]').forEach(button => button.addEventListener('click', () => {
   activeBatch = button.dataset.batch; commitDirectInput(activeBatch);
   const isName = activeBatch === 'name';
-  $('#batchTitle').textContent = isName ? '编辑员工姓名多值' : '编辑工号多值';
-  $('#batchTextarea').placeholder = isName ? '每行输入一个员工姓名' : '每行输入一个工号';
+  $('#batchTitle').textContent = isName ? '编辑收银员姓名多值' : '编辑工号多值';
+  $('#batchTextarea').placeholder = isName ? '每行输入一个收银员姓名' : '每行输入一个工号';
   $('#batchTextarea').value = [...batchValues[activeBatch]].join('\n');
   $('#batchCount').textContent = batchValues[activeBatch].size;
   $('#batchModal').hidden = false; $('#batchTextarea').focus();

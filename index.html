@@ -38,9 +38,9 @@
 
           <label class="filter-item area-item"><span>区域类型</span><div class="popover-control multi-select" id="areaFilter"><button class="select-trigger" id="areaTrigger" type="button"><b id="areaSummary">全部</b><em>⌄</em></button><div class="select-panel" id="areaPanel" hidden><label><input type="checkbox" value="全部" checked />全部</label><label><input type="checkbox" value="出境" checked />出境</label><label><input type="checkbox" value="入境" checked />入境</label></div></div></label>
 
-          <label class="filter-item team-item"><span>柜组</span><div class="popover-control" id="teamControl"><button class="select-trigger" id="teamTrigger" type="button"><b id="teamSummary" class="placeholder">请选择柜组</b><em>⌄</em></button><div class="cascade-panel" id="cascadePanel" hidden><div class="cascade-column" id="cascadeAreas"></div><div class="cascade-column" id="cascadeZones"></div><div class="cascade-column teams-column" id="cascadeTeams"></div></div></div></label>
+          <label class="filter-item team-item"><span>柜组</span><div class="popover-control" id="teamControl"><button class="select-trigger" id="teamTrigger" type="button"><b id="teamSummary" class="placeholder">请选择柜组</b><em>⌄</em></button><div class="cascade-panel" id="cascadePanel" hidden><div class="cascade-column" id="cascadeZones"></div><div class="cascade-column teams-column" id="cascadeTeams"></div></div></div></label>
 
-          <label class="filter-item value-item"><span>收银员</span><div class="batch-control"><input id="cashierNameInput" placeholder="请输入员工姓名" /><button type="button" class="more-button" data-batch="name" aria-label="批量输入员工姓名">•••</button></div></label>
+          <label class="filter-item value-item"><span>收银员</span><div class="batch-control"><input id="cashierNameInput" placeholder="请输入收银员姓名" /><button type="button" class="more-button" data-batch="name" aria-label="批量输入收银员姓名">•••</button></div></label>
           <label class="filter-item value-item id-item"><span>工号</span><div class="batch-control"><input id="cashierIdInput" placeholder="请输入8位工号" /><button type="button" class="more-button" data-batch="id" aria-label="批量输入工号">•••</button></div></label>
           <label class="filter-item relation-item"><span>关系类型</span><select class="el-input__inner" id="relationFilter"><option value="">全部类型</option><option>固定柜组</option><option>跨柜组</option></select></label>
           <div class="filter-buttons"><button class="primary small el-button el-button--primary" id="queryBtn">⌕ 查询</button><button class="ghost small el-button" id="resetBtn">↻ 重置</button></div>
@@ -49,7 +49,7 @@
       </section>
 
       <section class="toolbar">
-        <div><button class="primary el-button el-button--primary" id="addBtn">新增关系</button><button class="outline el-button" id="importBtn">导入</button><button class="danger el-button el-button--danger" id="batchDeleteBtn" type="button">▥ 批量删除</button></div>
+        <div><button class="primary el-button el-button--primary" id="addBtn">新增</button><button class="outline el-button" id="importBtn">导入</button><button class="danger el-button el-button--danger" id="batchDeleteBtn" type="button">▥ 批量删除</button></div>
         <button class="sync el-button el-button--primary is-plain" id="validateBtn">核对跨柜组记录</button>
       </section>
 
@@ -101,10 +101,10 @@
 
   <div class="modal-mask" id="batchModal" hidden>
     <div class="batch-modal el-dialog" role="dialog" aria-modal="true" aria-labelledby="batchTitle">
-      <div class="modal-head"><h2 id="batchTitle">编辑员工姓名多值</h2><button type="button" class="close" id="batchClose" aria-label="关闭">×</button></div>
+      <div class="modal-head"><h2 id="batchTitle">编辑收银员姓名多值</h2><button type="button" class="close" id="batchClose" aria-label="关闭">×</button></div>
       <div class="batch-body">
         <div class="batch-caption"><strong>输入选项值（每行一个）</strong><span>当前已输入：<b id="batchCount">0</b> 个</span></div>
-        <textarea id="batchTextarea" placeholder="每行输入一个员工姓名"></textarea>
+        <textarea id="batchTextarea" placeholder="每行输入一个收银员姓名"></textarea>
       </div>
       <div class="modal-actions"><button class="primary el-button el-button--primary" id="batchConfirm">确定</button><button class="ghost el-button" id="batchCancel">取消</button></div>
     </div>
