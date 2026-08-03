@@ -42,6 +42,7 @@ const areaPanel = $('#areaPanel');
 const cascadePanel = $('#cascadePanel');
 const monthPanel = $('#monthPanel');
 let selectedAreas = new Set(['出境', '入境']);
+let selectedZones = new Set();
 let selectedTeams = new Set();
 let activeZone = '烟酒A区';
 let monthStart = '2026-06';
@@ -98,8 +99,13 @@ areaPanel.addEventListener('change', event => {
   const { value, checked } = event.target;
   if (value === '全部') selectedAreas = checked ? new Set(['出境', '入境']) : new Set();
   else checked ? selectedAreas.add(value) : selectedAreas.delete(value);
-  selectedTeams = new Set([...selectedTeams].filter(team => [...selectedAreas].some(area => Object.values(areaHierarchy[area]).flat().includes(team))));
   const availableZones = zonesForSelectedAreas();
+  const availableZoneKeys = new Set(availableZones.map(item => item.key));
+  selectedZones = new Set([...selectedZones].filter(zone => availableZoneKeys.has(zone)));
+  selectedTeams = new Set([...selectedTeams].filter(key => {
+    const [zone, team] = key.split('::');
+    return availableZones.some(item => item.key === zone && item.teams.includes(team));
+  }));
   if (!availableZones.some(item => item.key === activeZone)) activeZone = availableZones[0]?.key || '';
   syncAreaCheckboxes(); renderCascade();
 });
@@ -107,25 +113,44 @@ areaPanel.addEventListener('change', event => {
 function zonesForSelectedAreas() {
   return [...selectedAreas].flatMap(area => Object.entries(areaHierarchy[area] || {}).map(([zone, teams]) => ({ key: zone, zone, teams })));
 }
+function teamSelectionKey(zone, team) { return `${zone}::${team}`; }
 function renderCascade() {
   const zones = zonesForSelectedAreas();
   if (!zones.some(item => item.key === activeZone)) activeZone = zones[0]?.key || '';
-  $('#cascadeZones').innerHTML = zones.length ? zones.map(item => `<label class="${item.key === activeZone ? 'active' : ''}"><input type="checkbox" data-zone-check="${item.key}" ${item.teams.every(team => selectedTeams.has(team)) ? 'checked' : ''}/><span data-zone-nav="${item.key}">${item.zone}</span><i>›</i></label>`).join('') : '<p>请先选择区域类型</p>';
+  $('#cascadeZones').innerHTML = zones.length ? zones.map(item => `<label class="${item.key === activeZone ? 'active' : ''}"><input type="checkbox" data-zone-check="${item.key}" ${selectedZones.has(item.key) ? 'checked' : ''}/><span data-zone-nav="${item.key}">${item.zone}</span><i>›</i></label>`).join('') : '<p>请先选择区域类型</p>';
   const activeItem = zones.find(item => item.key === activeZone);
   const teams = activeItem?.teams || [];
-  $('#cascadeTeams').innerHTML = teams.map(team => `<label><input type="checkbox" data-team="${team}" ${selectedTeams.has(team) ? 'checked' : ''}/><span>${team}</span></label>`).join('');
-  const summary = selectedTeams.size === 0 ? '请选择柜组' : selectedTeams.size === 1 ? [...selectedTeams][0] : `已选 ${selectedTeams.size} 项`;
-  $('#teamSummary').textContent = summary; $('#teamSummary').classList.toggle('placeholder', !selectedTeams.size);
+  $('#cascadeTeams').innerHTML = teams.map(team => `<label><input type="checkbox" data-team="${team}" ${selectedTeams.has(teamSelectionKey(activeZone, team)) ? 'checked' : ''}/><span>${team}</span></label>`).join('');
+  const selectedCount = selectedTeams.size;
+  const onlyTeam = selectedCount === 1 ? [...selectedTeams][0].split('::')[1] : '';
+  const summary = selectedCount === 0 ? '请选择柜组' : selectedCount === 1 ? onlyTeam : `已选 ${selectedZones.size} 个团队 / ${selectedCount} 个柜组`;
+  $('#teamSummary').textContent = summary; $('#teamSummary').classList.toggle('placeholder', !selectedCount);
 }
 $('#teamTrigger').addEventListener('click', () => { const opening = cascadePanel.hidden; closePopovers(cascadePanel); cascadePanel.hidden = !opening; renderCascade(); });
 cascadePanel.addEventListener('click', event => {
-  if (event.target.dataset.zoneNav) { activeZone = event.target.dataset.zoneNav; renderCascade(); }
+  const zoneName = event.target.closest('[data-zone-nav]');
+  if (zoneName) { activeZone = zoneName.dataset.zoneNav; renderCascade(); }
 });
 cascadePanel.addEventListener('change', event => {
-  let teams = [];
-  if (event.target.dataset.zoneCheck) teams = zonesForSelectedAreas().find(item => item.key === event.target.dataset.zoneCheck)?.teams || [];
-  if (event.target.dataset.team) teams = [event.target.dataset.team];
-  teams.forEach(team => event.target.checked ? selectedTeams.add(team) : selectedTeams.delete(team));
+  if (event.target.dataset.zoneCheck) {
+    const zone = event.target.dataset.zoneCheck;
+    const zoneTeams = zonesForSelectedAreas().find(item => item.key === zone)?.teams || [];
+    if (event.target.checked) {
+      selectedZones.add(zone);
+      zoneTeams.forEach(team => selectedTeams.add(teamSelectionKey(zone, team)));
+    } else {
+      selectedZones.delete(zone);
+      zoneTeams.forEach(team => selectedTeams.delete(teamSelectionKey(zone, team)));
+    }
+    activeZone = zone;
+  }
+  if (event.target.dataset.team) {
+    const key = teamSelectionKey(activeZone, event.target.dataset.team);
+    event.target.checked ? selectedTeams.add(key) : selectedTeams.delete(key);
+    const activeTeams = zonesForSelectedAreas().find(item => item.key === activeZone)?.teams || [];
+    if (activeTeams.some(team => selectedTeams.has(teamSelectionKey(activeZone, team)))) selectedZones.add(activeZone);
+    else selectedZones.delete(activeZone);
+  }
   renderCascade();
 });
 
@@ -203,7 +228,7 @@ document.querySelectorAll('[data-eop-toggle]').forEach(button => button.addEvent
 
 function filteredRecords() {
   commitDirectInput('name'); commitDirectInput('id');
-  return records.filter(record => record.month >= monthStart && record.month <= monthEnd && selectedAreas.has(record.area) && (!selectedTeams.size || selectedTeams.has(record.team)) && (!batchValues.name.size || batchValues.name.has(record.cashier)) && (!batchValues.id.size || batchValues.id.has(record.cashierId)));
+  return records.filter(record => record.month >= monthStart && record.month <= monthEnd && selectedAreas.has(record.area) && (!selectedTeams.size || selectedTeams.has(teamSelectionKey(record.zone, record.team))) && (!batchValues.name.size || batchValues.name.has(record.cashier)) && (!batchValues.id.size || batchValues.id.has(record.cashierId)));
 }
 function render() {
   const rows = filteredRecords();
@@ -214,7 +239,7 @@ function render() {
   tableBody.querySelectorAll('[data-delete]').forEach(button => button.addEventListener('click', () => { records = records.filter(record => record.id !== Number(button.dataset.delete)); render(); }));
 }
 function resetFilters() {
-  monthStart = monthEnd = '2026-06'; panelYear = 2026; pendingMonth = null; selectedAreas = new Set(['出境', '入境']); selectedTeams.clear(); batchValues.name.clear(); batchValues.id.clear();
+  monthStart = monthEnd = '2026-06'; panelYear = 2026; pendingMonth = null; selectedAreas = new Set(['出境', '入境']); selectedZones.clear(); selectedTeams.clear(); batchValues.name.clear(); batchValues.id.clear();
   $('#cashierNameInput').value = ''; $('#cashierIdInput').value = ''; $('#cashierNameInput').classList.remove('summary-value'); $('#cashierIdInput').classList.remove('summary-value');
   syncAreaCheckboxes(); updateMonthSummary(); renderCascade(); render();
 }
