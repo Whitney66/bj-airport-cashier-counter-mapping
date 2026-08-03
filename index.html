@@ -33,21 +33,29 @@
       </div>
 
       <section class="filters el-form" id="filters">
-        <div class="filter-grid">
-          <label class="el-form-item month-item"><span>月份</span><div class="month-range"><input class="el-input__inner" id="monthStart" type="month" value="2026-06" /><i>至</i><input class="el-input__inner" id="monthEnd" type="month" value="2026-06" /></div></label>
-          <label class="el-form-item"><span>区域类型</span><div class="multi-select" id="areaFilter"><button class="select-trigger" id="areaTrigger" type="button" aria-expanded="false"><b id="areaSummary">全部</b><i>⌄</i></button><div class="select-panel" id="areaPanel" hidden><label><input type="checkbox" value="全部" checked />全部</label><label><input type="checkbox" value="出境" checked />出境</label><label><input type="checkbox" value="入境" checked />入境</label></div></div></label>
-          <label class="el-form-item cascade-item"><span>柜组</span><div class="cascade"><select class="el-input__inner" id="cascadeArea"><option value="">全部区域</option></select><select class="el-input__inner" id="zoneFilter"><option value="">全部分区</option></select><select class="el-input__inner" id="teamFilter"><option value="">全部团队</option></select></div></label>
-          <label class="el-form-item"><span>收银员</span><div class="tag-input" id="cashierNameTags"><div class="tag-list"></div><input placeholder="输入后按 Enter" /></div></label>
-          <label class="el-form-item"><span>工号</span><div class="tag-input" id="cashierIdTags"><div class="tag-list"></div><input placeholder="输入后按 Enter" /></div></label>
-          <label class="el-form-item"><span>关系类型</span><select class="el-input__inner" id="relationFilter"><option value="">全部类型</option><option>固定柜组</option><option>跨柜组</option></select></label>
+        <div class="filter-line">
+          <label class="filter-item month-filter"><span>月份</span><div class="popover-control" id="monthControl"><button class="select-trigger date-trigger" id="monthTrigger" type="button"><i>▦</i><b id="monthSummary">2026-06 - 2026-06</b><em>⌄</em></button><div class="month-panel" id="monthPanel" hidden><div class="month-shortcuts" id="monthShortcuts"></div><div class="month-main"><div class="month-head"><button type="button" id="prevYear" aria-label="上一年">«</button><strong id="panelYear">2026 年</strong><button type="button" id="nextYear" aria-label="下一年">»</button></div><div class="month-grid" id="monthGrid"></div><p class="month-help" id="monthHelp">请选择开始月份</p></div></div></div></label>
+
+          <label class="filter-item area-item"><span>区域类型</span><div class="popover-control multi-select" id="areaFilter"><button class="select-trigger" id="areaTrigger" type="button"><b id="areaSummary">全部</b><em>⌄</em></button><div class="select-panel" id="areaPanel" hidden><label><input type="checkbox" value="全部" checked />全部</label><label><input type="checkbox" value="出境" checked />出境</label><label><input type="checkbox" value="入境" checked />入境</label></div></div></label>
+
+          <label class="filter-item team-item"><span>柜组</span><div class="popover-control" id="teamControl"><button class="select-trigger" id="teamTrigger" type="button"><b id="teamSummary" class="placeholder">请选择柜组</b><em>⌄</em></button><div class="cascade-panel" id="cascadePanel" hidden><div class="cascade-column" id="cascadeAreas"></div><div class="cascade-column" id="cascadeZones"></div><div class="cascade-column teams-column" id="cascadeTeams"></div></div></div></label>
+
+          <label class="filter-item value-item"><span>收银员</span><div class="batch-control"><input id="cashierNameInput" placeholder="请输入员工姓名" /><button type="button" class="more-button" data-batch="name" aria-label="批量输入员工姓名">•••</button></div></label>
+          <label class="filter-item value-item id-item"><span>工号</span><div class="batch-control"><input id="cashierIdInput" placeholder="请输入8位工号" /><button type="button" class="more-button" data-batch="id" aria-label="批量输入工号">•••</button></div></label>
+          <label class="filter-item relation-item"><span>关系类型</span><select class="el-input__inner" id="relationFilter"><option value="">全部类型</option><option>固定柜组</option><option>跨柜组</option></select></label>
           <div class="filter-buttons"><button class="primary small el-button el-button--primary" id="queryBtn">⌕ 查询</button><button class="ghost small el-button" id="resetBtn">↻ 重置</button></div>
         </div>
         <p class="filter-error" id="filterError" role="alert"></p>
       </section>
 
+      <section class="toolbar">
+        <div><button class="primary el-button el-button--primary" id="addBtn">新增关系</button><button class="outline el-button" id="importBtn">导入</button><button class="danger el-button el-button--danger" id="batchDeleteBtn" type="button">▥ 批量删除</button></div>
+        <button class="sync el-button el-button--primary is-plain" id="validateBtn">核对跨柜组记录</button>
+      </section>
+
       <section class="table-wrap el-table el-table--border">
         <table class="el-table__body">
-          <thead><tr><th>月份</th><th>区域类型</th><th>柜组</th><th>收银员</th><th>工号</th><th>关系类型</th></tr></thead>
+          <thead><tr><th class="check"><input type="checkbox" id="selectAll" aria-label="全选" /></th><th>月份</th><th>区域类型</th><th>柜组</th><th>收银员</th><th>工号</th><th>关系类型</th><th>操作</th></tr></thead>
           <tbody id="tableBody"></tbody>
         </table>
       </section>
@@ -58,6 +66,50 @@
       </footer>
     </main>
   </div>
+
+  <div class="modal-mask" id="relationModal" hidden>
+    <div class="relation-modal el-dialog" role="dialog" aria-modal="true">
+      <div class="modal-head"><h2 id="relationTitle">新增关系</h2><button type="button" class="close" data-close-modal="relationModal" aria-label="关闭">×</button></div>
+      <div class="relation-form">
+        <label><span>月份</span><input id="relationMonth" type="month" value="2026-06" /></label>
+        <label><span>区域类型</span><select id="relationArea"></select></label>
+        <label class="wide"><span>柜组</span><select id="relationTeam"></select></label>
+        <label><span>收银员</span><input id="relationCashier" placeholder="请输入收银员" /></label>
+        <label><span>工号</span><input id="relationCashierId" placeholder="请输入工号" /></label>
+        <label><span>关系类型</span><select id="relationType"><option>固定柜组</option><option>跨柜组</option></select></label>
+      </div>
+      <div class="modal-actions"><button class="primary el-button el-button--primary" id="saveRelationBtn">确定</button><button class="ghost el-button" data-close-modal="relationModal">取消</button></div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="importModal" hidden>
+    <div class="import-modal el-dialog" role="dialog" aria-modal="true">
+      <div class="modal-head"><h2>导入收银员柜组关系</h2><button type="button" class="close" data-close-modal="importModal" aria-label="关闭">×</button></div>
+      <div class="upload-box"><div class="cloud">☁</div><p>将文件拖到此处，或<span>点击上传</span></p><input type="file" accept=".xls,.xlsx" /></div>
+      <p class="hint">模板字段：月份、区域类型、柜组、收银员、工号、关系类型。<a href="#">下载模板</a></p>
+      <div class="modal-actions"><button class="primary el-button el-button--primary" data-close-modal="importModal">确定</button><button class="ghost el-button" data-close-modal="importModal">取消</button></div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="reviewModal" hidden>
+    <div class="review-modal el-dialog" role="dialog" aria-modal="true">
+      <div class="modal-head"><h2>核对跨柜组记录</h2><button type="button" class="close" data-close-modal="reviewModal" aria-label="关闭">×</button></div>
+      <div class="review-body"><p class="review-tip">以下为跨柜组收款关系，请核对柜组、收银员及工号。</p><table class="review-table"><thead><tr><th>月份</th><th>区域</th><th>柜组</th><th>收银员</th><th>工号</th></tr></thead><tbody id="reviewBody"></tbody></table></div>
+      <div class="modal-actions"><button class="primary el-button el-button--primary" data-close-modal="reviewModal">确认核对</button><button class="ghost el-button" data-close-modal="reviewModal">取消</button></div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="batchModal" hidden>
+    <div class="batch-modal el-dialog" role="dialog" aria-modal="true" aria-labelledby="batchTitle">
+      <div class="modal-head"><h2 id="batchTitle">编辑员工姓名多值</h2><button type="button" class="close" id="batchClose" aria-label="关闭">×</button></div>
+      <div class="batch-body">
+        <div class="batch-caption"><strong>输入选项值（每行一个）</strong><span>当前已输入：<b id="batchCount">0</b> 个</span></div>
+        <textarea id="batchTextarea" placeholder="每行输入一个员工姓名"></textarea>
+      </div>
+      <div class="modal-actions"><button class="primary el-button el-button--primary" id="batchConfirm">确定</button><button class="ghost el-button" id="batchCancel">取消</button></div>
+    </div>
+  </div>
+
   <script src="./script.js"></script>
 </body>
 </html>
