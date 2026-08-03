@@ -26,6 +26,16 @@ Object.entries(areaHierarchy).forEach(([area, zones]) => Object.entries(zones).f
   records.push({ id: nextId++, month: index % 4 === 0 ? '2026-05' : index % 5 === 0 ? '2026-07' : '2026-06', area, zone, team, cashier, cashierId: cashierIds[cashier] });
 })));
 
+const scenarioRecords = [
+  { month: '2026-06', area: '出境', zone: '烟酒A区', team: '[72231501]DXS烟酒', cashier: '李振东', cashierId: 'BJCA0001' },
+  { month: '2026-06', area: '出境', zone: '香化A区', team: '[72231101]DXM中心店', cashier: '李振东', cashierId: 'BJCA0001' },
+  { month: '2026-07', area: '出境', zone: '精品区', team: '[72231201]DXW BOSS', cashier: '李振东', cashierId: 'BJCA0001' },
+  { month: '2026-06', area: '入境', zone: '烟酒B区', team: '[72235103]DXA烟酒', cashier: '李振东', cashierId: 'BJCA0088' },
+  { month: '2026-06', area: '出境', zone: '香化A区', team: '[72231501]DXS烟酒', cashier: '王燕燕', cashierId: 'BJCA0010' },
+  { month: '2026-06', area: '入境', zone: '香化B区', team: '[72235105]DXA香化', cashier: '王燕燕', cashierId: 'BJCA0096' }
+];
+scenarioRecords.forEach(record => records.unshift({ id: nextId++, ...record }));
+
 const $ = selector => document.querySelector(selector);
 const tableBody = $('#tableBody');
 const areaPanel = $('#areaPanel');
@@ -236,17 +246,6 @@ $('#saveRelationBtn').addEventListener('click', () => {
 });
 $('#addBtn').addEventListener('click', () => openRelation());
 $('#importBtn').addEventListener('click', () => { $('#importModal').hidden = false; });
-$('#validateBtn').addEventListener('click', () => {
-  const validKeys = new Set(records.reduce((keys, record) => {
-    const key = `${record.month}|${record.cashierId}`;
-    const teams = records.filter(item => `${item.month}|${item.cashierId}` === key).map(item => item.team);
-    if (new Set(teams).size > 1) keys.add(key);
-    return keys;
-  }, new Set()));
-  const rows = records.filter(record => validKeys.has(`${record.month}|${record.cashierId}`)).sort((a, b) => `${a.month}${a.cashierId}`.localeCompare(`${b.month}${b.cashierId}`));
-  $('#reviewBody').innerHTML = rows.map(record => `<tr><td>${record.month}</td><td>${record.area}</td><td>${record.team}</td><td>${record.cashier}</td><td>${record.cashierId}</td></tr>`).join('') || '<tr><td colspan="5">暂无同月跨柜组记录</td></tr>';
-  $('#reviewModal').hidden = false;
-});
 $('#batchDeleteBtn').addEventListener('click', () => { if (!selectedIds.size) return; records = records.filter(record => !selectedIds.has(record.id)); selectedIds.clear(); render(); });
 $('#selectAll').addEventListener('change', event => { filteredRecords().forEach(record => event.target.checked ? selectedIds.add(record.id) : selectedIds.delete(record.id)); render(); });
 document.querySelectorAll('[data-close-modal]').forEach(button => button.addEventListener('click', () => { $(`#${button.dataset.closeModal}`).hidden = true; }));

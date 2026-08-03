@@ -49,7 +49,6 @@
 
       <section class="toolbar">
         <div><button class="primary el-button el-button--primary" id="addBtn">新增</button><button class="outline el-button" id="importBtn">导入</button><button class="danger el-button el-button--danger" id="batchDeleteBtn" type="button">▥ 批量删除</button></div>
-        <button class="sync el-button el-button--primary is-plain" id="validateBtn">核对跨柜组记录</button>
       </section>
 
       <section class="table-wrap el-table el-table--border">
@@ -91,13 +90,6 @@
     </div>
   </div>
 
-  <div class="modal-mask" id="reviewModal" hidden>
-    <div class="review-modal el-dialog" role="dialog" aria-modal="true">
-      <div class="modal-head"><h2>核对跨柜组记录</h2><button type="button" class="close" data-close-modal="reviewModal" aria-label="关闭">×</button></div>
-      <div class="review-body"><p class="review-tip">以下为跨柜组收款关系，请核对柜组、收银员及工号。</p><table class="review-table"><thead><tr><th>月份</th><th>区域</th><th>柜组</th><th>收银员</th><th>工号</th></tr></thead><tbody id="reviewBody"></tbody></table></div>
-      <div class="modal-actions"><button class="primary el-button el-button--primary" data-close-modal="reviewModal">确认核对</button><button class="ghost el-button" data-close-modal="reviewModal">取消</button></div>
-    </div>
-  </div>
 
   <div class="modal-mask" id="batchModal" hidden>
     <div class="batch-modal el-dialog" role="dialog" aria-modal="true" aria-labelledby="batchTitle">
