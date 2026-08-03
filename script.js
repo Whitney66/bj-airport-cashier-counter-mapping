@@ -160,17 +160,26 @@ function resetFilters() {
   syncAreaCheckboxes(); updateMonthSummary(); renderCascade(); render();
 }
 
-function fillRelationTeams(area, selected = '') {
-  $('#relationTeam').innerHTML = Object.entries(areaHierarchy[area]).flatMap(([zone, teams]) => teams.map(team => `<option value="${zone}|${team}" ${team === selected ? 'selected' : ''}>${zone} / ${team}</option>`)).join('');
+function fillRelationZones(area, selected = '') {
+  const zones = Object.keys(areaHierarchy[area] || {});
+  $('#relationZone').innerHTML = zones.map(zone => `<option ${zone === selected ? 'selected' : ''}>${zone}</option>`).join('');
+  fillRelationTeams(area, $('#relationZone').value);
+}
+function fillRelationTeams(area, zone, selected = '') {
+  $('#relationTeam').innerHTML = (areaHierarchy[area]?.[zone] || []).map(team => `<option value="${team}" ${team === selected ? 'selected' : ''}>${team}</option>`).join('');
 }
 function openRelation(record) {
-  editingId = record?.id || null; $('#relationTitle').textContent = record ? '修改关系' : '新增关系';
+  editingId = record?.id || null; $('#relationTitle').textContent = record ? '修改关系' : '新增';
   $('#relationArea').innerHTML = Object.keys(areaHierarchy).map(area => `<option ${record?.area === area ? 'selected' : ''}>${area}</option>`).join('');
-  fillRelationTeams($('#relationArea').value, record?.team); $('#relationMonth').value = record?.month || '2026-06'; $('#relationCashier').value = record?.cashier || ''; $('#relationCashierId').value = record?.cashierId || ''; $('#relationType').value = record?.relationType || '固定柜组'; $('#relationModal').hidden = false;
+  fillRelationZones($('#relationArea').value, record?.zone);
+  fillRelationTeams($('#relationArea').value, $('#relationZone').value, record?.team);
+  $('#relationMonth').value = record?.month || '2026-06'; $('#relationCashier').value = record?.cashier || ''; $('#relationCashierId').value = record?.cashierId || ''; $('#relationType').value = record?.relationType || '固定柜组'; $('#relationModal').hidden = false;
 }
-$('#relationArea').addEventListener('change', () => fillRelationTeams($('#relationArea').value));
+$('#relationArea').addEventListener('change', () => fillRelationZones($('#relationArea').value));
+$('#relationZone').addEventListener('change', () => fillRelationTeams($('#relationArea').value, $('#relationZone').value));
 $('#saveRelationBtn').addEventListener('click', () => {
-  const [zone, team] = $('#relationTeam').value.split('|');
+  const zone = $('#relationZone').value;
+  const team = $('#relationTeam').value;
   const payload = { month: $('#relationMonth').value, area: $('#relationArea').value, zone, team, cashier: $('#relationCashier').value.trim() || '未填写', cashierId: $('#relationCashierId').value.trim() || '未填写', relationType: $('#relationType').value };
 
   if (payload.relationType === '跨柜组') {

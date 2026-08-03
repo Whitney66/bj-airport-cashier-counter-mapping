@@ -107,7 +107,7 @@ th:nth-child(2) { width:105px; } th:nth-child(3) { width:105px; } th:nth-child(4
 .modal-mask { position:fixed; inset:0; z-index:100; display:grid; place-items:center; background:rgba(0,0,0,.28); }
 .batch-modal,.relation-modal,.import-modal,.review-modal { border-radius:4px; background:#fff; box-shadow:var(--shadow); }
 .batch-modal { width:min(900px,calc(100vw - 40px)); }
-.relation-modal { width:min(760px,calc(100vw - 40px)); }
+.relation-modal { width:min(1560px,calc(100vw - 48px)); }
 .import-modal { width:min(560px,calc(100vw - 40px)); }
 .review-modal { width:min(980px,calc(100vw - 40px)); }
 .modal-head { height:56px; padding:0 24px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--line); }
@@ -118,11 +118,15 @@ th:nth-child(2) { width:105px; } th:nth-child(3) { width:105px; } th:nth-child(4
 .batch-caption b { color:#606266; }
 .batch-body textarea { width:100%; height:150px; padding:16px 24px; resize:vertical; border:1px solid #409eff; border-radius:4px; outline:0; font-size:17px; line-height:28px; }
 .modal-actions { height:70px; padding:0 24px; display:flex; align-items:center; justify-content:center; gap:18px; border-top:1px solid var(--line); }
-.relation-form { padding:22px 24px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
-.relation-form label { display:block; }
-.relation-form label span { display:block; margin-bottom:7px; }
-.relation-form input,.relation-form select { width:100%; padding:0 10px; }
-.relation-form .wide { grid-column:1/-1; }
+.relation-notice { margin:22px 28px 0; min-height:46px; padding:12px 16px; display:flex; align-items:center; gap:28px; border-left:4px solid #e6a23c; background:#fff8d8; color:#606266; }
+.relation-notice strong { color:#26384d; white-space:nowrap; }
+.relation-form { margin:18px 28px 26px; padding:20px; display:grid; grid-template-columns:1fr .9fr 1fr 1.65fr 1.1fr 1.05fr 1fr; gap:16px; border:1px solid #d9e3ef; border-radius:4px; background:#f8fbff; }
+.relation-form label { min-width:0; display:block; }
+.relation-form label span { min-height:22px; margin-bottom:8px; display:block; color:#26384d; font-weight:700; white-space:nowrap; }
+.relation-form label span i { margin-right:4px; color:#f56c6c; font-style:normal; }
+.relation-form input,.relation-form select { width:100%; padding:0 10px; background:#fff; }
+.relation-form small { min-height:38px; margin-top:8px; display:block; color:#8392a6; line-height:19px; }
+.relation-form .counter-field { min-width:220px; }
 .upload-box { height:160px; margin:22px; position:relative; display:grid; place-items:center; border:1px dashed #c0c4cc; background:#fbfdff; text-align:center; }
 .upload-box input { position:absolute; inset:0; width:100%; height:100%; opacity:0; }
 .cloud { color:#409eff; font-size:34px; }
@@ -134,4 +138,5 @@ th:nth-child(2) { width:105px; } th:nth-child(3) { width:105px; } th:nth-child(4
 .review-table th,.review-table td { height:42px; font-size:14px; }
 @media (max-width:1500px) { .filter-line { gap:14px 20px; } .month-filter { flex-basis:235px; } .area-item { flex-basis:160px; } .team-item { max-width:280px; } .value-item { flex-basis:200px; } }
 @media (max-width:1100px) { .filter-item { flex:1 1 280px; } .team-item { max-width:none; } .filter-buttons { margin-left:0; } .cascade-panel { left:auto; right:0; } }
-@media (max-width:700px) { .topbar { overflow-x:auto; } .page { padding:10px; } .filter-item { flex-basis:100%; } .month-panel { width:min(440px,calc(100vw - 40px)); } .cascade-panel { grid-template-columns:1fr; height:520px; } .cascade-column { min-height:0; border-right:0; border-bottom:1px solid #e4e7ed; } .relation-form { grid-template-columns:1fr; } .relation-form .wide { grid-column:auto; } .toolbar,.pager { min-width:700px; } }
+@media (max-width:1100px) { .relation-modal { overflow-x:auto; } .relation-notice,.relation-form { min-width:1280px; } }
+@media (max-width:700px) { .topbar { overflow-x:auto; } .page { padding:10px; } .filter-item { flex-basis:100%; } .month-panel { width:min(440px,calc(100vw - 40px)); } .cascade-panel { grid-template-columns:1fr; height:520px; } .cascade-column { min-height:0; border-right:0; border-bottom:1px solid #e4e7ed; } .toolbar,.pager { min-width:700px; } }
