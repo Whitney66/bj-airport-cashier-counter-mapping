@@ -16,12 +16,14 @@ const zoneCashiers = {
   精品区: ['梅珍珍', '高银璐', '李文瑞']
 };
 const allNames = [...new Set(Object.values(zoneCashiers).flat())];
-const cashierIds = Object.fromEntries(allNames.map((name, index) => [name, `BJCA${String(index + 1).padStart(4, '0')}`]));
+const eopEmployees = allNames.map((name, index) => ({ name, id: `BJCA${String(index + 1).padStart(4, '0')}` }));
+eopEmployees.push({ name: '李振东', id: 'BJCA0088' }, { name: '王燕燕', id: 'BJCA0096' });
+const cashierIds = Object.fromEntries(eopEmployees.map(employee => [employee.name, employee.id]));
 let records = [];
 let nextId = 1;
 Object.entries(areaHierarchy).forEach(([area, zones]) => Object.entries(zones).forEach(([zone, teams]) => teams.forEach((team, index) => {
   const cashier = (zoneCashiers[zone] || allNames)[index % (zoneCashiers[zone] || allNames).length];
-  records.push({ id: nextId++, month: index % 4 === 0 ? '2026-05' : index % 5 === 0 ? '2026-07' : '2026-06', area, zone, team, cashier, cashierId: cashierIds[cashier], relationType: index % 6 === 5 ? '跨柜组' : '固定柜组' });
+  records.push({ id: nextId++, month: index % 4 === 0 ? '2026-05' : index % 5 === 0 ? '2026-07' : '2026-06', area, zone, team, cashier, cashierId: cashierIds[cashier] });
 })));
 
 const $ = selector => document.querySelector(selector);
@@ -142,13 +144,60 @@ function closeBatch() { $('#batchModal').hidden = true; }
 $('#batchConfirm').addEventListener('click', () => { batchValues[activeBatch] = new Set(parseValues($('#batchTextarea').value)); syncBatchInput(activeBatch); closeBatch(); });
 $('#batchCancel').addEventListener('click', closeBatch); $('#batchClose').addEventListener('click', closeBatch);
 
+function eopMatches(type, query) {
+  const value = query.trim().toLowerCase();
+  return eopEmployees.filter(employee => (type === 'name' ? employee.name : employee.id).toLowerCase().includes(value));
+}
+function renderEopOptions(type) {
+  const input = type === 'name' ? $('#relationCashier') : $('#relationCashierId');
+  const panel = type === 'name' ? $('#cashierOptions') : $('#cashierIdOptions');
+  const matches = eopMatches(type, input.value);
+  panel.innerHTML = matches.length ? matches.map(employee => `<button type="button" data-eop-index="${eopEmployees.indexOf(employee)}"><strong>${type === 'name' ? employee.name : employee.id}</strong><small>${type === 'name' ? employee.id : employee.name}</small></button>`).join('') : '<p>暂无匹配的 EOP 员工</p>';
+  panel.hidden = false;
+}
+function selectEopEmployee(employee) {
+  $('#relationCashier').value = employee.name;
+  $('#relationCashierId').value = employee.id;
+  $('#cashierOptions').hidden = true;
+  $('#cashierIdOptions').hidden = true;
+}
+function syncEopRelation(type) {
+  const input = type === 'name' ? $('#relationCashier') : $('#relationCashierId');
+  const matches = eopMatches(type, input.value);
+  const exact = matches.filter(employee => (type === 'name' ? employee.name : employee.id) === input.value.trim());
+  if (exact.length === 1) selectEopEmployee(exact[0]);
+  renderEopOptions(type);
+}
+['name', 'id'].forEach(type => {
+  const input = type === 'name' ? $('#relationCashier') : $('#relationCashierId');
+  const panel = type === 'name' ? $('#cashierOptions') : $('#cashierIdOptions');
+  input.addEventListener('focus', () => renderEopOptions(type));
+  input.addEventListener('input', () => syncEopRelation(type));
+  panel.addEventListener('click', event => {
+    const index = event.target.closest('[data-eop-index]')?.dataset.eopIndex;
+    if (index !== undefined) selectEopEmployee(eopEmployees[Number(index)]);
+  });
+});
+document.addEventListener('click', event => {
+  if (!$('#cashierCombo').contains(event.target)) $('#cashierOptions').hidden = true;
+  if (!$('#cashierIdCombo').contains(event.target)) $('#cashierIdOptions').hidden = true;
+});
+document.querySelectorAll('[data-eop-toggle]').forEach(button => button.addEventListener('click', () => {
+  const type = button.dataset.eopToggle;
+  const panel = type === 'name' ? $('#cashierOptions') : $('#cashierIdOptions');
+  const input = type === 'name' ? $('#relationCashier') : $('#relationCashierId');
+  const opening = panel.hidden;
+  if (opening) renderEopOptions(type); else panel.hidden = true;
+  if (opening) input.focus();
+}));
+
 function filteredRecords() {
   commitDirectInput('name'); commitDirectInput('id');
-  return records.filter(record => record.month >= monthStart && record.month <= monthEnd && selectedAreas.has(record.area) && (!selectedTeams.size || selectedTeams.has(record.team)) && (!batchValues.name.size || batchValues.name.has(record.cashier)) && (!batchValues.id.size || batchValues.id.has(record.cashierId)) && (!$('#relationFilter').value || record.relationType === $('#relationFilter').value));
+  return records.filter(record => record.month >= monthStart && record.month <= monthEnd && selectedAreas.has(record.area) && (!selectedTeams.size || selectedTeams.has(record.team)) && (!batchValues.name.size || batchValues.name.has(record.cashier)) && (!batchValues.id.size || batchValues.id.has(record.cashierId)));
 }
 function render() {
   const rows = filteredRecords();
-  tableBody.innerHTML = rows.length ? rows.map(record => `<tr><td class="check"><input type="checkbox" data-row="${record.id}" ${selectedIds.has(record.id) ? 'checked' : ''}/></td><td>${record.month}</td><td>${record.area}</td><td>${record.zone}</td><td title="${record.team}">${record.team}</td><td>${record.cashier}</td><td>${record.cashierId}</td><td><span class="badge el-tag ${record.relationType === '跨柜组' ? 'cross' : 'fixed'}">${record.relationType}</span></td><td><div class="ops"><button data-edit="${record.id}">修改</button><button data-delete="${record.id}">删除</button></div></td></tr>`).join('') : '<tr><td colspan="9" class="empty-row">暂无符合条件的数据</td></tr>';
+  tableBody.innerHTML = rows.length ? rows.map(record => `<tr><td class="check"><input type="checkbox" data-row="${record.id}" ${selectedIds.has(record.id) ? 'checked' : ''}/></td><td>${record.month}</td><td>${record.area}</td><td>${record.zone}</td><td title="${record.team}">${record.team}</td><td>${record.cashier}</td><td>${record.cashierId}</td><td><div class="ops"><button data-edit="${record.id}">修改</button><button data-delete="${record.id}">删除</button></div></td></tr>`).join('') : '<tr><td colspan="8" class="empty-row">暂无符合条件的数据</td></tr>';
   $('#totalText').textContent = `共 ${rows.length} 条`;
   tableBody.querySelectorAll('[data-row]').forEach(input => input.addEventListener('change', () => input.checked ? selectedIds.add(Number(input.dataset.row)) : selectedIds.delete(Number(input.dataset.row))));
   tableBody.querySelectorAll('[data-edit]').forEach(button => button.addEventListener('click', () => openRelation(records.find(record => record.id === Number(button.dataset.edit)))));
@@ -156,7 +205,7 @@ function render() {
 }
 function resetFilters() {
   monthStart = monthEnd = '2026-06'; panelYear = 2026; pendingMonth = null; selectedAreas = new Set(['出境', '入境']); selectedTeams.clear(); batchValues.name.clear(); batchValues.id.clear();
-  $('#cashierNameInput').value = ''; $('#cashierIdInput').value = ''; $('#cashierNameInput').classList.remove('summary-value'); $('#cashierIdInput').classList.remove('summary-value'); $('#relationFilter').value = '';
+  $('#cashierNameInput').value = ''; $('#cashierIdInput').value = ''; $('#cashierNameInput').classList.remove('summary-value'); $('#cashierIdInput').classList.remove('summary-value');
   syncAreaCheckboxes(); updateMonthSummary(); renderCascade(); render();
 }
 
@@ -173,32 +222,14 @@ function openRelation(record) {
   $('#relationArea').innerHTML = Object.keys(areaHierarchy).map(area => `<option ${record?.area === area ? 'selected' : ''}>${area}</option>`).join('');
   fillRelationZones($('#relationArea').value, record?.zone);
   fillRelationTeams($('#relationArea').value, $('#relationZone').value, record?.team);
-  $('#relationMonth').value = record?.month || '2026-06'; $('#relationCashier').value = record?.cashier || ''; $('#relationCashierId').value = record?.cashierId || ''; $('#relationType').value = record?.relationType || '固定柜组'; $('#relationModal').hidden = false;
+  $('#relationMonth').value = record?.month || '2026-06'; $('#relationCashier').value = record?.cashier || ''; $('#relationCashierId').value = record?.cashierId || ''; $('#relationModal').hidden = false;
 }
 $('#relationArea').addEventListener('change', () => fillRelationZones($('#relationArea').value));
 $('#relationZone').addEventListener('change', () => fillRelationTeams($('#relationArea').value, $('#relationZone').value));
 $('#saveRelationBtn').addEventListener('click', () => {
   const zone = $('#relationZone').value;
   const team = $('#relationTeam').value;
-  const payload = { month: $('#relationMonth').value, area: $('#relationArea').value, zone, team, cashier: $('#relationCashier').value.trim() || '未填写', cashierId: $('#relationCashierId').value.trim() || '未填写', relationType: $('#relationType').value };
-
-  if (payload.relationType === '跨柜组') {
-    const sameMonthRelations = records.filter(record => record.id !== editingId && record.month === payload.month && record.cashierId === payload.cashierId && record.team !== payload.team);
-    if (sameMonthRelations.length) {
-      if (!sameMonthRelations.some(record => record.relationType === '固定柜组')) {
-        const fixedId = sameMonthRelations[0].id;
-        records = records.map(record => record.id === fixedId ? { ...record, relationType: '固定柜组' } : record);
-      }
-    } else {
-      const historicalFixed = records.find(record => record.id !== editingId && record.cashierId === payload.cashierId && record.relationType === '固定柜组' && record.team !== payload.team);
-      if (historicalFixed) {
-        records.unshift({ ...historicalFixed, id: nextId++, month: payload.month, cashier: payload.cashier });
-      } else {
-        payload.relationType = '固定柜组';
-        window.alert('该收银员暂无可沿用的固定柜组，本次关系已作为当月固定柜组保存。请再新增其他柜组关系以形成跨柜组。');
-      }
-    }
-  }
+  const payload = { month: $('#relationMonth').value, area: $('#relationArea').value, zone, team, cashier: $('#relationCashier').value.trim() || '未填写', cashierId: $('#relationCashierId').value.trim() || '未填写' };
 
   if (editingId) records = records.map(record => record.id === editingId ? { ...record, ...payload } : record); else records.unshift({ id: nextId++, ...payload });
   $('#relationModal').hidden = true; render();
@@ -212,7 +243,7 @@ $('#validateBtn').addEventListener('click', () => {
     if (new Set(teams).size > 1) keys.add(key);
     return keys;
   }, new Set()));
-  const rows = records.filter(record => record.relationType === '跨柜组' && validKeys.has(`${record.month}|${record.cashierId}`)).sort((a, b) => `${a.month}${a.cashierId}`.localeCompare(`${b.month}${b.cashierId}`));
+  const rows = records.filter(record => validKeys.has(`${record.month}|${record.cashierId}`)).sort((a, b) => `${a.month}${a.cashierId}`.localeCompare(`${b.month}${b.cashierId}`));
   $('#reviewBody').innerHTML = rows.map(record => `<tr><td>${record.month}</td><td>${record.area}</td><td>${record.team}</td><td>${record.cashier}</td><td>${record.cashierId}</td></tr>`).join('') || '<tr><td colspan="5">暂无同月跨柜组记录</td></tr>';
   $('#reviewModal').hidden = false;
 });

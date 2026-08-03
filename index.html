@@ -42,7 +42,6 @@
 
           <label class="filter-item value-item"><span>收银员</span><div class="batch-control"><input id="cashierNameInput" placeholder="请输入收银员姓名" /><button type="button" class="more-button" data-batch="name" aria-label="批量输入收银员姓名">•••</button></div></label>
           <label class="filter-item value-item id-item"><span>工号</span><div class="batch-control"><input id="cashierIdInput" placeholder="请输入8位工号" /><button type="button" class="more-button" data-batch="id" aria-label="批量输入工号">•••</button></div></label>
-          <label class="filter-item relation-item"><span>关系类型</span><select class="el-input__inner" id="relationFilter"><option value="">全部类型</option><option>固定柜组</option><option>跨柜组</option></select></label>
           <div class="filter-buttons"><button class="primary small el-button el-button--primary" id="queryBtn">⌕ 查询</button><button class="ghost small el-button" id="resetBtn">↻ 重置</button></div>
         </div>
         <p class="filter-error" id="filterError" role="alert"></p>
@@ -55,7 +54,7 @@
 
       <section class="table-wrap el-table el-table--border">
         <table class="el-table__body">
-          <thead><tr><th class="check"><input type="checkbox" id="selectAll" aria-label="全选" /></th><th>月份</th><th>区域类型</th><th>团队</th><th>柜组</th><th>收银员</th><th>工号</th><th>关系类型</th><th>操作</th></tr></thead>
+          <thead><tr><th class="check"><input type="checkbox" id="selectAll" aria-label="全选" /></th><th>月份</th><th>区域类型</th><th>团队</th><th>柜组</th><th>收银员</th><th>工号</th><th>操作</th></tr></thead>
           <tbody id="tableBody"></tbody>
         </table>
       </section>
@@ -76,9 +75,8 @@
         <label><span><i>*</i>区域类型</span><select id="relationArea"></select><small>必填，选择出境或入境。</small></label>
         <label><span><i>*</i>团队</span><select id="relationZone"></select><small>必填，按区域联动团队。</small></label>
         <label class="counter-field"><span><i>*</i>柜组</span><select id="relationTeam"></select><small>必填，展示“[编码]柜组名称”。</small></label>
-        <label><span><i>*</i>收银员</span><input id="relationCashier" placeholder="请输入收银员姓名" /><small>必填，填写收银员姓名。</small></label>
-        <label><span><i>*</i>工号</span><input id="relationCashierId" placeholder="请输入工号" /><small>必填，用于同月跨柜组校验。</small></label>
-        <label><span><i>*</i>关系类型</span><select id="relationType"><option>固定柜组</option><option>跨柜组</option></select><small>跨柜组需存在同月其他柜组。</small></label>
+        <label><span><i>*</i>收银员</span><div class="eop-combo" id="cashierCombo"><input id="relationCashier" autocomplete="off" placeholder="请输入或选择收银员姓名" /><button type="button" class="combo-arrow" data-eop-toggle="name" aria-label="选择收银员">⌄</button><div class="eop-options" id="cashierOptions" hidden></div></div><small>必填，来源于总部 EOP；重名时按工号区分。</small></label>
+        <label><span><i>*</i>工号</span><div class="eop-combo" id="cashierIdCombo"><input id="relationCashierId" autocomplete="off" placeholder="请输入或选择工号" /><button type="button" class="combo-arrow" data-eop-toggle="id" aria-label="选择工号">⌄</button><div class="eop-options" id="cashierIdOptions" hidden></div></div><small>必填，与收银员姓名相互关联。</small></label>
       </div>
       <div class="modal-actions"><button class="primary el-button el-button--primary" id="saveRelationBtn">确定</button><button class="ghost el-button" data-close-modal="relationModal">取消</button></div>
     </div>
@@ -88,7 +86,7 @@
     <div class="import-modal el-dialog" role="dialog" aria-modal="true">
       <div class="modal-head"><h2>导入收银员柜组关系</h2><button type="button" class="close" data-close-modal="importModal" aria-label="关闭">×</button></div>
       <div class="upload-box"><div class="cloud">☁</div><p>将文件拖到此处，或<span>点击上传</span></p><input type="file" accept=".xls,.xlsx" /></div>
-      <p class="hint">模板字段：月份、区域类型、团队、柜组、收银员、工号、关系类型。<a href="./templates/收银员与柜组关系导入模板.xlsx" download>下载模板</a></p>
+      <p class="hint">模板字段：月份、区域类型、团队、柜组、收银员、工号。<a href="./templates/收银员与柜组关系导入模板.xlsx" download>下载模板</a></p>
       <div class="modal-actions"><button class="primary el-button el-button--primary" data-close-modal="importModal">确定</button><button class="ghost el-button" data-close-modal="importModal">取消</button></div>
     </div>
   </div>

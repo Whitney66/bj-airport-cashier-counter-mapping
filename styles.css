@@ -120,12 +120,22 @@ th:nth-child(2) { width:105px; } th:nth-child(3) { width:105px; } th:nth-child(4
 .modal-actions { height:70px; padding:0 24px; display:flex; align-items:center; justify-content:center; gap:18px; border-top:1px solid var(--line); }
 .relation-notice { margin:22px 28px 0; min-height:46px; padding:12px 16px; display:flex; align-items:center; gap:28px; border-left:4px solid #e6a23c; background:#fff8d8; color:#606266; }
 .relation-notice strong { color:#26384d; white-space:nowrap; }
-.relation-form { margin:18px 28px 26px; padding:20px; display:grid; grid-template-columns:1fr .9fr 1fr 1.65fr 1.1fr 1.05fr 1fr; gap:16px; border:1px solid #d9e3ef; border-radius:4px; background:#f8fbff; }
+.relation-form { margin:18px 28px 26px; padding:20px; display:grid; grid-template-columns:1fr .9fr 1fr 1.7fr 1.2fr 1.1fr; gap:16px; border:1px solid #d9e3ef; border-radius:4px; background:#f8fbff; }
 .relation-form label { min-width:0; display:block; }
 .relation-form label span { min-height:22px; margin-bottom:8px; display:block; color:#26384d; font-weight:700; white-space:nowrap; }
 .relation-form label span i { margin-right:4px; color:#f56c6c; font-style:normal; }
 .relation-form input,.relation-form select { width:100%; padding:0 10px; background:#fff; }
 .relation-form small { min-height:38px; margin-top:8px; display:block; color:#8392a6; line-height:19px; }
+.eop-combo { position:relative; display:flex; }
+.eop-combo input { min-width:0; padding-right:38px; }
+.combo-arrow { position:absolute; top:1px; right:1px; width:36px; height:34px; border:0; border-left:1px solid #e4e7ed; background:#fff; color:#909399; }
+.eop-options { position:absolute; top:40px; left:0; right:0; z-index:120; max-height:230px; overflow-y:auto; border:1px solid #dcdfe6; border-radius:3px; background:#fff; box-shadow:var(--shadow); }
+.eop-options[hidden] { display:none; }
+.eop-options button { width:100%; min-height:42px; padding:6px 10px; display:flex; align-items:center; justify-content:space-between; gap:10px; border:0; border-bottom:1px solid #f0f2f5; background:#fff; color:#303133; text-align:left; }
+.eop-options button:hover { background:#ecf5ff; }
+.eop-options button strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:400; }
+.eop-options button small { min-height:0; margin:0; flex:0 0 auto; color:#909399; }
+.eop-options p { margin:0; padding:14px 10px; color:#909399; text-align:center; }
 .relation-form .counter-field { min-width:220px; }
 .upload-box { height:160px; margin:22px; position:relative; display:grid; place-items:center; border:1px dashed #c0c4cc; background:#fbfdff; text-align:center; }
 .upload-box input { position:absolute; inset:0; width:100%; height:100%; opacity:0; }
