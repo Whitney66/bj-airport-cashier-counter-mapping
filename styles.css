@@ -71,8 +71,9 @@ button { cursor:pointer; }
 .month-grid button.selected { background:#409eff; color:#fff; }
 .month-help { height:20px; margin:8px 0 0; color:#909399; text-align:center; font-size:12px; }
 .cascade-panel { position:absolute; top:42px; left:0; z-index:30; width:min(560px,calc(100vw - 48px)); height:300px; display:grid; grid-template-columns:210px minmax(300px,1fr); border:1px solid #dcdfe6; background:#fff; box-shadow:var(--shadow); }
-.cascade-column { min-width:0; overflow-y:auto; border-right:1px solid #e4e7ed; padding:7px 0; }
+.cascade-column { min-width:0; overflow-y:auto; border-right:1px solid #e4e7ed; padding:0 0 7px; }
 .cascade-column:last-child { border-right:0; }
+.cascade-title { position:sticky; top:0; z-index:1; height:36px; padding:0 12px; display:flex; align-items:center; border-bottom:1px solid #e4e7ed; background:#f5f7fa; color:#606266; font-weight:600; }
 .cascade-column label span { min-width:0; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .cascade-column label i { color:#a8abb2; font-style:normal; }
 .cascade-column p { padding:12px; color:#909399; }

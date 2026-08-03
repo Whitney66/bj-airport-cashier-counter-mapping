@@ -38,7 +38,7 @@
 
           <label class="filter-item area-item"><span>区域类型</span><div class="popover-control multi-select" id="areaFilter"><button class="select-trigger" id="areaTrigger" type="button"><b id="areaSummary">全部</b><em>⌄</em></button><div class="select-panel" id="areaPanel" hidden><label><input type="checkbox" value="全部" checked />全部</label><label><input type="checkbox" value="出境" checked />出境</label><label><input type="checkbox" value="入境" checked />入境</label></div></div></label>
 
-          <label class="filter-item team-item"><span>柜组</span><div class="popover-control" id="teamControl"><button class="select-trigger" id="teamTrigger" type="button"><b id="teamSummary" class="placeholder">请选择柜组</b><em>⌄</em></button><div class="cascade-panel" id="cascadePanel" hidden><div class="cascade-column" id="cascadeZones"></div><div class="cascade-column teams-column" id="cascadeTeams"></div></div></div></label>
+          <label class="filter-item team-item"><span>柜组</span><div class="popover-control" id="teamControl"><button class="select-trigger" id="teamTrigger" type="button"><b id="teamSummary" class="placeholder">请选择柜组</b><em>⌄</em></button><div class="cascade-panel" id="cascadePanel" hidden><div class="cascade-column"><div class="cascade-title">团队</div><div id="cascadeZones"></div></div><div class="cascade-column teams-column"><div class="cascade-title">柜组</div><div id="cascadeTeams"></div></div></div></div></label>
 
           <label class="filter-item value-item"><span>收银员</span><div class="batch-control"><input id="cashierNameInput" placeholder="请输入收银员姓名" /><button type="button" class="more-button" data-batch="name" aria-label="批量输入收银员姓名">•••</button></div></label>
           <label class="filter-item value-item id-item"><span>工号</span><div class="batch-control"><input id="cashierIdInput" placeholder="请输入8位工号" /><button type="button" class="more-button" data-batch="id" aria-label="批量输入工号">•••</button></div></label>
@@ -86,7 +86,7 @@
     <div class="import-modal el-dialog" role="dialog" aria-modal="true">
       <div class="modal-head"><h2>导入收银员柜组关系</h2><button type="button" class="close" data-close-modal="importModal" aria-label="关闭">×</button></div>
       <div class="upload-box"><div class="cloud">☁</div><p>将文件拖到此处，或<span>点击上传</span></p><input type="file" accept=".xls,.xlsx" /></div>
-      <p class="hint">模板字段：月份、区域类型、柜组、收银员、工号、关系类型。<a href="#">下载模板</a></p>
+      <p class="hint">模板字段：月份、区域类型、团队、柜组、收银员、工号、关系类型。<a href="./templates/收银员与柜组关系导入模板.xlsx" download>下载模板</a></p>
       <div class="modal-actions"><button class="primary el-button el-button--primary" data-close-modal="importModal">确定</button><button class="ghost el-button" data-close-modal="importModal">取消</button></div>
     </div>
   </div>
