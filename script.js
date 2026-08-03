@@ -148,7 +148,7 @@ function filteredRecords() {
 }
 function render() {
   const rows = filteredRecords();
-  tableBody.innerHTML = rows.length ? rows.map(record => `<tr><td class="check"><input type="checkbox" data-row="${record.id}" ${selectedIds.has(record.id) ? 'checked' : ''}/></td><td>${record.month}</td><td>${record.area}</td><td title="${record.zone} / ${record.team}"><span class="zone-name">${record.zone}</span>${record.team}</td><td>${record.cashier}</td><td>${record.cashierId}</td><td><span class="badge el-tag ${record.relationType === '跨柜组' ? 'cross' : 'fixed'}">${record.relationType}</span></td><td><div class="ops"><button data-edit="${record.id}">修改</button><button data-delete="${record.id}">删除</button></div></td></tr>`).join('') : '<tr><td colspan="8" class="empty-row">暂无符合条件的数据</td></tr>';
+  tableBody.innerHTML = rows.length ? rows.map(record => `<tr><td class="check"><input type="checkbox" data-row="${record.id}" ${selectedIds.has(record.id) ? 'checked' : ''}/></td><td>${record.month}</td><td>${record.area}</td><td>${record.zone}</td><td title="${record.team}">${record.team}</td><td>${record.cashier}</td><td>${record.cashierId}</td><td><span class="badge el-tag ${record.relationType === '跨柜组' ? 'cross' : 'fixed'}">${record.relationType}</span></td><td><div class="ops"><button data-edit="${record.id}">修改</button><button data-delete="${record.id}">删除</button></div></td></tr>`).join('') : '<tr><td colspan="9" class="empty-row">暂无符合条件的数据</td></tr>';
   $('#totalText').textContent = `共 ${rows.length} 条`;
   tableBody.querySelectorAll('[data-row]').forEach(input => input.addEventListener('change', () => input.checked ? selectedIds.add(Number(input.dataset.row)) : selectedIds.delete(Number(input.dataset.row))));
   tableBody.querySelectorAll('[data-edit]').forEach(button => button.addEventListener('click', () => openRelation(records.find(record => record.id === Number(button.dataset.edit)))));
@@ -170,13 +170,43 @@ function openRelation(record) {
 }
 $('#relationArea').addEventListener('change', () => fillRelationTeams($('#relationArea').value));
 $('#saveRelationBtn').addEventListener('click', () => {
-  const [zone, team] = $('#relationTeam').value.split('|'); const payload = { month: $('#relationMonth').value, area: $('#relationArea').value, zone, team, cashier: $('#relationCashier').value.trim() || '未填写', cashierId: $('#relationCashierId').value.trim() || '未填写', relationType: $('#relationType').value };
+  const [zone, team] = $('#relationTeam').value.split('|');
+  const payload = { month: $('#relationMonth').value, area: $('#relationArea').value, zone, team, cashier: $('#relationCashier').value.trim() || '未填写', cashierId: $('#relationCashierId').value.trim() || '未填写', relationType: $('#relationType').value };
+
+  if (payload.relationType === '跨柜组') {
+    const sameMonthRelations = records.filter(record => record.id !== editingId && record.month === payload.month && record.cashierId === payload.cashierId && record.team !== payload.team);
+    if (sameMonthRelations.length) {
+      if (!sameMonthRelations.some(record => record.relationType === '固定柜组')) {
+        const fixedId = sameMonthRelations[0].id;
+        records = records.map(record => record.id === fixedId ? { ...record, relationType: '固定柜组' } : record);
+      }
+    } else {
+      const historicalFixed = records.find(record => record.id !== editingId && record.cashierId === payload.cashierId && record.relationType === '固定柜组' && record.team !== payload.team);
+      if (historicalFixed) {
+        records.unshift({ ...historicalFixed, id: nextId++, month: payload.month, cashier: payload.cashier });
+      } else {
+        payload.relationType = '固定柜组';
+        window.alert('该收银员暂无可沿用的固定柜组，本次关系已作为当月固定柜组保存。请再新增其他柜组关系以形成跨柜组。');
+      }
+    }
+  }
+
   if (editingId) records = records.map(record => record.id === editingId ? { ...record, ...payload } : record); else records.unshift({ id: nextId++, ...payload });
   $('#relationModal').hidden = true; render();
 });
 $('#addBtn').addEventListener('click', () => openRelation());
 $('#importBtn').addEventListener('click', () => { $('#importModal').hidden = false; });
-$('#validateBtn').addEventListener('click', () => { const rows = records.filter(record => record.relationType === '跨柜组'); $('#reviewBody').innerHTML = rows.map(record => `<tr><td>${record.month}</td><td>${record.area}</td><td>${record.team}</td><td>${record.cashier}</td><td>${record.cashierId}</td></tr>`).join('') || '<tr><td colspan="5">暂无跨柜组记录</td></tr>'; $('#reviewModal').hidden = false; });
+$('#validateBtn').addEventListener('click', () => {
+  const validKeys = new Set(records.reduce((keys, record) => {
+    const key = `${record.month}|${record.cashierId}`;
+    const teams = records.filter(item => `${item.month}|${item.cashierId}` === key).map(item => item.team);
+    if (new Set(teams).size > 1) keys.add(key);
+    return keys;
+  }, new Set()));
+  const rows = records.filter(record => record.relationType === '跨柜组' && validKeys.has(`${record.month}|${record.cashierId}`)).sort((a, b) => `${a.month}${a.cashierId}`.localeCompare(`${b.month}${b.cashierId}`));
+  $('#reviewBody').innerHTML = rows.map(record => `<tr><td>${record.month}</td><td>${record.area}</td><td>${record.team}</td><td>${record.cashier}</td><td>${record.cashierId}</td></tr>`).join('') || '<tr><td colspan="5">暂无同月跨柜组记录</td></tr>';
+  $('#reviewModal').hidden = false;
+});
 $('#batchDeleteBtn').addEventListener('click', () => { if (!selectedIds.size) return; records = records.filter(record => !selectedIds.has(record.id)); selectedIds.clear(); render(); });
 $('#selectAll').addEventListener('change', event => { filteredRecords().forEach(record => event.target.checked ? selectedIds.add(record.id) : selectedIds.delete(record.id)); render(); });
 document.querySelectorAll('[data-close-modal]').forEach(button => button.addEventListener('click', () => { $(`#${button.dataset.closeModal}`).hidden = true; }));
