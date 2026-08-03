@@ -117,8 +117,6 @@ th:nth-child(2) { width:105px; } th:nth-child(3) { width:105px; } th:nth-child(4
 .batch-caption b { color:#606266; }
 .batch-body textarea { width:100%; height:150px; padding:16px 24px; resize:vertical; border:1px solid #409eff; border-radius:4px; outline:0; font-size:17px; line-height:28px; }
 .modal-actions { height:70px; padding:0 24px; display:flex; align-items:center; justify-content:center; gap:18px; border-top:1px solid var(--line); }
-.relation-notice { margin:22px 28px 0; min-height:46px; padding:12px 16px; display:flex; align-items:center; gap:28px; border-left:4px solid #e6a23c; background:#fff8d8; color:#606266; }
-.relation-notice strong { color:#26384d; white-space:nowrap; }
 .relation-form { margin:18px 28px 26px; padding:20px; display:grid; grid-template-columns:1fr .9fr 1fr 1.7fr 1.2fr 1.1fr; gap:16px; border:1px solid #d9e3ef; border-radius:4px; background:#f8fbff; }
 .relation-form label { min-width:0; display:block; }
 .relation-form label span { min-height:22px; margin-bottom:8px; display:block; color:#26384d; font-weight:700; white-space:nowrap; }
@@ -143,5 +141,5 @@ th:nth-child(2) { width:105px; } th:nth-child(3) { width:105px; } th:nth-child(4
 .hint { margin:0 22px 18px; color:#909399; }
 @media (max-width:1500px) { .filter-line { gap:14px 20px; } .month-filter { flex-basis:235px; } .area-item { flex-basis:160px; } .team-item { max-width:280px; } .value-item { flex-basis:200px; } }
 @media (max-width:1100px) { .filter-item { flex:1 1 280px; } .team-item { max-width:none; } .filter-buttons { margin-left:0; } .cascade-panel { left:auto; right:0; } }
-@media (max-width:1100px) { .relation-modal { overflow-x:auto; } .relation-notice,.relation-form { min-width:1280px; } }
+@media (max-width:1100px) { .relation-modal { overflow-x:auto; } .relation-form { min-width:1280px; } }
 @media (max-width:700px) { .topbar { overflow-x:auto; } .page { padding:10px; } .filter-item { flex-basis:100%; } .month-panel { width:min(440px,calc(100vw - 40px)); } .cascade-panel { grid-template-columns:1fr; height:520px; } .cascade-column { min-height:0; border-right:0; border-bottom:1px solid #e4e7ed; } .toolbar,.pager { min-width:700px; } }
